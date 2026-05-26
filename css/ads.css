@@ -1,5 +1,5 @@
 /**
- * Fixed left banner (120×600) — desktop only, contained so it cannot cover the site
+ * Fixed left banner (120×600) — desktop, contained in narrow slot
  */
 
 :root {
@@ -12,7 +12,6 @@
   display: none;
 }
 
-/* Main content always above background, below nothing from ads */
 .site-header,
 .home-main,
 .static-page,
@@ -22,7 +21,7 @@
   z-index: 10;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   body.has-ad-rail {
     padding-left: var(--ad-rail-w);
   }
@@ -56,7 +55,6 @@
     height: var(--ad-banner-h);
     flex-shrink: 0;
     overflow: hidden;
-    contain: strict;
     isolation: isolate;
     border-radius: 8px;
     background: #12101c;
@@ -110,15 +108,7 @@
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    right: auto !important;
-    bottom: auto !important;
     margin: 0 !important;
     border: 0 !important;
   }
-}
-
-/* Block full-screen ad bleed outside the slot */
-body.has-ad-rail > iframe,
-body.has-ad-rail > ins:not(.ad-rail__slot ins) {
-  display: none !important;
 }

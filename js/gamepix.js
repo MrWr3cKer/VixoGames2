@@ -9,11 +9,11 @@ const GAMEPIX_FEED_BASE = "https://feeds.gamepix.com/v2/json";
 const FETCH_CHUNK_SIZE = 4;
 const FETCH_TIMEOUT_MS = 25000;
 
-/** Main catalog pages (loaded in two phases for fast first paint) */
-const INITIAL_MAIN_PAGES = 6;
-const QUICK_LOAD_PAGES = 3;
+/** Main catalog pages — quick first, rest in background */
+const INITIAL_MAIN_PAGES = 4;
+const QUICK_LOAD_PAGES = 2;
 /** Per category row on homepage */
-const CATEGORY_PAGES_EACH = 2;
+const CATEGORY_PAGES_EACH = 1;
 const CATEGORY_BATCH_SIZE = 3;
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
@@ -657,12 +657,11 @@ function mergeIntoVixoGames(items) {
   );
 }
 
-function applyHomepageCatalog(allPages, categoryResults) {
+function applyHomepageEssentials(allPages) {
   const trendingGrid = document.getElementById("gamepix-trending");
   const newGrid = document.getElementById("gamepix-new");
-  const categoryRoot = document.getElementById("category-sections");
 
-  if (!allPages.length) return false;
+  if (!allPages.length || !trendingGrid) return false;
 
   const featured = allPages[0];
   if (featured) updateHeroFromGame(featured);
@@ -676,20 +675,16 @@ function applyHomepageCatalog(allPages, categoryResults) {
   const newGames = allPages.slice(TRENDING_SHOW, TRENDING_SHOW + NEW_SHOW);
   if (newGrid) {
     const newList =
-      newGames.length >= 12
+      newGames.length >= 8
         ? newGames
         : allPages.slice(
             Math.floor(TRENDING_SHOW / 2),
             Math.floor(TRENDING_SHOW / 2) + NEW_SHOW
           );
-      renderGameCards(newGrid, newList, function (item, index) {
-        return { tag: index < 2 ? "new" : null, large: false, showFavorite: true };
-      });
+    renderGameCards(newGrid, newList, function (item, index) {
+      return { tag: index < 2 ? "new" : null, large: false, showFavorite: true };
+    });
     setSectionCount("count-new", newGrid.querySelectorAll(".game-card").length);
-  }
-
-  if (categoryRoot) {
-    mountLazyCategorySections(categoryResults);
   }
 
   const usedInMain = new Set(
@@ -706,13 +701,33 @@ function applyHomepageCatalog(allPages, categoryResults) {
     forAll.length > INITIAL_ALL_SHOW ||
     allPages.length >= activePageSize;
 
+  window.vixoGames = dedupeGames(allPages.slice());
+
+  const statTotal = document.getElementById("stat-total");
+  if (statTotal) statTotal.textContent = `${window.vixoGames.length}+`;
+
+  document.dispatchEvent(
+    new CustomEvent("vixo:games-loaded", { detail: window.vixoGames })
+  );
+
+  return true;
+}
+
+function applyHomepageExtras(allPages, categoryResults) {
+  const categoryRoot = document.getElementById("category-sections");
+  if (categoryRoot && categoryResults && categoryResults.length) {
+    mountLazyCategorySections(categoryResults);
+  }
+
   const library = dedupeGames(
     allPages.concat(
-      categoryResults.flatMap(function (r) {
+      (categoryResults || []).flatMap(function (r) {
         return r.items;
       })
     )
   );
+
+  window.vixoGames = library;
 
   const statTotal = document.getElementById("stat-total");
   if (statTotal) statTotal.textContent = `${library.length}+`;
@@ -720,13 +735,30 @@ function applyHomepageCatalog(allPages, categoryResults) {
   const statCat = document.getElementById("stat-categories");
   if (statCat) statCat.textContent = String(HOME_CATEGORIES.length);
 
-  window.vixoGames = library;
-
   document.dispatchEvent(
     new CustomEvent("vixo:games-loaded", { detail: window.vixoGames })
   );
+}
 
-  return true;
+async function loadHomepageExtrasInBackground(seedPages) {
+  try {
+    let allPages = seedPages.slice();
+    const extraPageCount = Math.max(0, INITIAL_MAIN_PAGES - QUICK_LOAD_PAGES);
+    const [extraPages, categoryResults] = await Promise.all([
+      extraPageCount
+        ? fetchGamePixPageRange(QUICK_LOAD_PAGES + 1, extraPageCount, null)
+        : Promise.resolve([]),
+      fetchAllCategorySections(),
+    ]);
+
+    if (extraPages.length) {
+      allPages = dedupeGames(allPages.concat(extraPages));
+    }
+
+    applyHomepageExtras(allPages, categoryResults);
+  } catch (err) {
+    console.warn("Background homepage load:", err);
+  }
 }
 
 async function loadGamePixHomepage() {
@@ -752,10 +784,6 @@ async function loadGamePixHomepage() {
   setGridMessage(trendingGrid, "Loading games…", "loading");
   if (newGrid) setGridMessage(newGrid, "Loading new games…", "loading");
   if (allGrid) setGridMessage(allGrid, "Loading library…", "loading");
-  if (categoryRoot) {
-    categoryRoot.innerHTML =
-      '<p class="category-loading-msg">Loading category rows…</p>';
-  }
 
   try {
     const feedOk = await ensureFeedConnection();
@@ -770,21 +798,8 @@ async function loadGamePixHomepage() {
       throw new Error("No games returned from the feed.");
     }
 
-    applyHomepageCatalog(allPages, []);
-
-    const extraPageCount = Math.max(0, INITIAL_MAIN_PAGES - QUICK_LOAD_PAGES);
-    const [extraPages, categoryResults] = await Promise.all([
-      extraPageCount
-        ? fetchGamePixPageRange(QUICK_LOAD_PAGES + 1, extraPageCount, null)
-        : Promise.resolve([]),
-      fetchAllCategorySections(),
-    ]);
-
-    if (extraPages.length) {
-      allPages = dedupeGames(allPages.concat(extraPages));
-    }
-
-    applyHomepageCatalog(allPages, categoryResults);
+    applyHomepageEssentials(allPages);
+    loadHomepageExtrasInBackground(allPages);
   } catch (err) {
     console.error("GamePix load error:", err);
     showLoadError(
