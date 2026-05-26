@@ -97,13 +97,13 @@
 }
 
 .browse-categories__grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.65rem;
 }
 
 .browse-card {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.2rem;

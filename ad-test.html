@@ -4,17 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ad slot test – VixoGames</title>
-  <link rel="stylesheet" href="css/ads.css?v=11" />
-  <link rel="preconnect" href="https://data527.click" crossorigin />
+  <link rel="stylesheet" href="css/ads.css?v=12" />
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #0c0a14;
-      color: #f4f0ff;
-      padding: 2rem 2rem 2rem 11rem;
-    }
-    p { max-width: 520px; line-height: 1.6; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0c0a14; color: #f4f0ff; }
+    .demo-main { position: relative; z-index: 10; padding: 2rem 2rem 2rem 11rem; max-width: 600px; }
   </style>
 </head>
 <body class="has-ad-rail">
@@ -24,13 +17,13 @@
         <span>Ad space</span>
         <span class="ad-rail__placeholder-size">120 × 600</span>
       </div>
-      <ins style="width: 120px;height:600px" data-width="120" data-height="600" class="u27eb8fe8d3" data-domain="//data527.click" data-affquery="/ed3ecbae9a77159e4e93/27eb8fe8d3/?placementName=Banner1"><script src="https://data527.click/js/responsive.js" async></script></ins>
     </div>
   </aside>
-
-  <h1>Ad test</h1>
-  <p>Fixed 120×600 banner on the left. Scroll — it should stay in place.</p>
-  <p><a href="index.html" style="color:#a855f7">← Home</a></p>
-  <script src="js/ad-slot.js?v=1" defer></script>
+  <main class="demo-main">
+    <h1>Ad test</h1>
+    <p>Desktop: ad on the left only. This text should stay visible beside it.</p>
+    <p><a href="index.html" style="color:#a855f7">← Home</a></p>
+  </main>
+  <script src="js/ad-slot.js?v=2" defer></script>
 </body>
 </html>
