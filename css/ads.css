@@ -1,5 +1,5 @@
 /**
- * Left ad — full-width header, fixed ad column on desktop
+ * Dual skyscraper ads — left + center content + right (desktop)
  */
 
 :root {
@@ -18,6 +18,7 @@
 .ad-rail__slot {
   width: var(--ad-banner-w);
   min-width: var(--ad-banner-w);
+  max-width: var(--ad-banner-w);
 }
 
 .ad-rail__slot ins {
@@ -37,7 +38,88 @@
   min-width: 0;
 }
 
-@media (min-width: 1024px) {
+/* Wide desktop: both side banners + centered content */
+@media (min-width: 1500px) {
+  body.has-ad-rail .site-header,
+  body.has-ad-rail .play-header {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  body.has-ad-rail .play-header {
+    height: var(--header-h);
+    min-height: var(--header-h);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  body.has-ad-rail .site-body {
+    display: grid;
+    grid-template-columns: var(--ad-rail-w) minmax(0, 1fr) var(--ad-rail-w);
+    align-items: start;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ad-rail {
+    display: block;
+    position: sticky;
+    top: var(--effective-header-h);
+    align-self: start;
+    z-index: 50;
+    width: var(--ad-rail-w);
+    max-height: calc(100dvh - var(--effective-header-h));
+    overflow: visible;
+  }
+
+  .ad-rail__slot {
+    position: sticky;
+    top: var(--effective-header-h);
+  }
+
+  /* Banners flush against center column */
+  .ad-rail--left .ad-rail__slot {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .ad-rail--right .ad-rail__slot {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  body.has-ad-rail .page-content {
+    width: 100%;
+    max-width: none;
+  }
+
+  body.has-ad-rail .page-content .home-main,
+  body.has-ad-rail .page-content main,
+  body.has-ad-rail .page-content .site-footer,
+  body.has-ad-rail .page-content .static-page,
+  body.has-ad-rail .page-content .play-layout {
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
+
+  body.has-ad-rail .page-content .home-main,
+  body.has-ad-rail .page-content .static-page,
+  body.has-ad-rail .page-content .play-layout {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  body.has-ad-rail .page-content .site-footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+/* Medium desktop: left banner only (not enough room for both) */
+@media (min-width: 1024px) and (max-width: 1499px) {
   body.has-ad-rail .site-header,
   body.has-ad-rail .play-header {
     width: 100%;
@@ -57,7 +139,7 @@
     align-items: start;
   }
 
-  .ad-rail {
+  .ad-rail--left {
     display: block;
     position: sticky;
     top: var(--effective-header-h);
@@ -68,14 +150,48 @@
     overflow: visible;
   }
 
-  .ad-rail__slot {
+  .ad-rail--left .ad-rail__slot {
     position: sticky;
     top: var(--effective-header-h);
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  body.has-ad-rail .page-content {
+    width: 100%;
+    max-width: none;
+  }
+
+  body.has-ad-rail .page-content .home-main,
+  body.has-ad-rail .page-content main,
+  body.has-ad-rail .page-content .site-footer,
+  body.has-ad-rail .page-content .static-page,
+  body.has-ad-rail .page-content .play-layout {
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
+
+  body.has-ad-rail .page-content .home-main,
+  body.has-ad-rail .page-content .static-page,
+  body.has-ad-rail .page-content .play-layout {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .ad-rail--right {
+    display: none;
   }
 }
 
 @media (max-width: 1023px) {
   body.has-ad-rail .site-body {
     display: block;
+  }
+
+  .ad-rail {
+    display: none !important;
   }
 }

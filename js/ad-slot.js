@@ -1,18 +1,20 @@
 /**
- * Load the ad script only on desktop (>=1024px).
- * Hidden iframes on narrow windows stay blank — that was the start.bat bug.
+ * Load ad script on desktop; affilistStart handles every <ins> on the page.
  */
 (function () {
-  var DESKTOP = window.matchMedia("(min-width: 1024px)");
+  var DESKTOP_LEFT = window.matchMedia("(min-width: 1024px)");
+  var DESKTOP_DUAL = window.matchMedia("(min-width: 1500px)");
   var SCRIPT_SRC = "//data527.click/js/responsive.js";
 
-  function getSlot() {
-    return document.querySelector(".ad-rail__slot");
+  function hasIns() {
+    return !!document.querySelector(".ad-rail__slot ins[data-affquery]");
   }
 
-  function hasIns() {
-    var slot = getSlot();
-    return !!(slot && slot.querySelector("ins[data-affquery]"));
+  function shouldLoadAds() {
+    if (!hasIns()) return false;
+    if (DESKTOP_DUAL.matches) return true;
+    if (DESKTOP_LEFT.matches) return true;
+    return false;
   }
 
   function startAffilist() {
@@ -49,7 +51,7 @@
   }
 
   function boot() {
-    if (!DESKTOP.matches || !hasIns()) return;
+    if (!shouldLoadAds()) return;
 
     loadResponsive(function () {
       var tries = 0;
@@ -66,7 +68,6 @@
     window.addEventListener("load", boot);
   }
 
-  DESKTOP.addEventListener("change", function (event) {
-    if (event.matches) boot();
-  });
+  DESKTOP_LEFT.addEventListener("change", boot);
+  DESKTOP_DUAL.addEventListener("change", boot);
 })();

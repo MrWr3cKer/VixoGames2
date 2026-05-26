@@ -1,4 +1,4 @@
-const CACHE_NAME = "vixo-shell-v17";
+const CACHE_NAME = "vixo-shell-v20";
 
 const SHELL = [
   "index.html",
