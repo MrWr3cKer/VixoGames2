@@ -1,54 +1,72 @@
 /**
- * Keeps banner ads inside #ad-slot; moves stray iframes from <body> into the slot.
+ * Load the ad script only on desktop (>=1024px).
+ * Hidden iframes on narrow windows stay blank — that was the start.bat bug.
  */
 (function () {
+  var DESKTOP = window.matchMedia("(min-width: 1024px)");
+  var SCRIPT_SRC = "//data527.click/js/responsive.js";
+
   function getSlot() {
-    return document.getElementById("ad-slot");
+    return document.querySelector(".ad-rail__slot");
   }
 
-  function markLoaded(slot) {
-    if (slot && slot.querySelector("iframe, img, a[href]")) {
-      slot.classList.add("is-ad-loaded");
-    }
-  }
-
-  function moveStrayAdsIntoSlot(slot) {
-    if (!slot) return;
-    document.querySelectorAll("body > iframe").forEach(function (iframe) {
-      if (iframe.closest(".ad-rail__slot")) return;
-      slot.appendChild(iframe);
-    });
-  }
-
-  function watch() {
+  function hasIns() {
     var slot = getSlot();
-    if (!slot) return;
+    return !!(slot && slot.querySelector("ins[data-affquery]"));
+  }
 
-    markLoaded(slot);
-    moveStrayAdsIntoSlot(slot);
+  function startAffilist() {
+    if (typeof window.affilistStart !== "function") return false;
+    window.affilistStart();
+    return true;
+  }
 
-    var observer = new MutationObserver(function () {
-      markLoaded(slot);
-      moveStrayAdsIntoSlot(slot);
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+  function loadResponsive(done) {
+    if (typeof window.affilistStart === "function") {
+      done();
+      return;
+    }
 
-    window.addEventListener("load", function () {
-      markLoaded(slot);
-      moveStrayAdsIntoSlot(slot);
-    });
+    var existing = document.querySelector("script[data-vixo-ad-script]");
+    if (existing) {
+      if (existing.dataset.loaded === "1") {
+        done();
+      } else {
+        existing.addEventListener("load", done, { once: true });
+      }
+      return;
+    }
 
-    [300, 1000, 3000, 8000].forEach(function (ms) {
-      setTimeout(function () {
-        markLoaded(slot);
-        moveStrayAdsIntoSlot(slot);
-      }, ms);
+    var script = document.createElement("script");
+    script.src = SCRIPT_SRC;
+    script.async = true;
+    script.setAttribute("data-vixo-ad-script", "1");
+    script.onload = function () {
+      script.dataset.loaded = "1";
+      done();
+    };
+    document.head.appendChild(script);
+  }
+
+  function boot() {
+    if (!DESKTOP.matches || !hasIns()) return;
+
+    loadResponsive(function () {
+      var tries = 0;
+      (function tryStart() {
+        if (startAffilist() || ++tries > 40) return;
+        setTimeout(tryStart, 100);
+      })();
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", watch);
+  if (document.readyState === "complete") {
+    boot();
   } else {
-    watch();
+    window.addEventListener("load", boot);
   }
+
+  DESKTOP.addEventListener("change", function (event) {
+    if (event.matches) boot();
+  });
 })();

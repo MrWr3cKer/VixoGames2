@@ -870,6 +870,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    var host = window.location.hostname;
+    var isLocal = host === "localhost" || host === "127.0.0.1";
+    if (isLocal) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (reg) {
+          reg.unregister();
+        });
+      });
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (keys) {
+          keys.forEach(function (key) {
+            caches.delete(key);
+          });
+        });
+      }
+    } else {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    }
   }
 });

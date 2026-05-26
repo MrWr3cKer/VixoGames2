@@ -1,114 +1,81 @@
 /**
- * Fixed left banner (120×600) — desktop, contained in narrow slot
+ * Left ad — full-width header, fixed ad column on desktop
  */
 
 :root {
-  --ad-rail-w: 136px;
-  --ad-banner-w: 120px;
-  --ad-banner-h: 600px;
+  --ad-rail-w: 300px;
+  --ad-banner-w: 300px;
+}
+
+.has-ad-rail {
+  --effective-header-h: var(--header-h);
 }
 
 .ad-rail {
   display: none;
 }
 
-.site-header,
-.home-main,
-.static-page,
-.play-layout,
-.site-footer {
-  position: relative;
-  z-index: 10;
+.ad-rail__slot {
+  width: var(--ad-banner-w);
+  min-width: var(--ad-banner-w);
+}
+
+.ad-rail__slot ins {
+  display: block;
+  width: var(--ad-banner-w);
+}
+
+.ad-rail__slot iframe {
+  display: block;
+  width: var(--ad-banner-w);
+  max-width: var(--ad-banner-w);
+  border: 0;
+}
+
+.page-content {
+  width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
-  body.has-ad-rail {
-    padding-left: var(--ad-rail-w);
+  body.has-ad-rail .site-header,
+  body.has-ad-rail .play-header {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  body.has-ad-rail .play-header {
+    height: var(--header-h);
+    min-height: var(--header-h);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  body.has-ad-rail .site-body {
+    display: grid;
+    grid-template-columns: var(--ad-rail-w) minmax(0, 1fr);
+    align-items: start;
   }
 
   .ad-rail {
-    display: flex;
-    position: fixed;
-    left: 0;
-    top: 0;
+    display: block;
+    position: sticky;
+    top: var(--effective-header-h);
+    align-self: start;
+    z-index: 50;
     width: var(--ad-rail-w);
-    height: 100vh;
-    height: 100dvh;
-    z-index: 40;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      rgba(12, 10, 20, 0.96) 0%,
-      rgba(12, 10, 20, 0.85) 80%,
-      transparent 100%
-    );
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    max-height: calc(100dvh - var(--effective-header-h));
+    overflow: visible;
   }
 
   .ad-rail__slot {
-    position: relative;
-    pointer-events: auto;
-    width: var(--ad-banner-w);
-    height: var(--ad-banner-h);
-    flex-shrink: 0;
-    overflow: hidden;
-    isolation: isolate;
-    border-radius: 8px;
-    background: #12101c;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: var(--effective-header-h);
   }
+}
 
-  .ad-rail__placeholder {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0.5rem;
-    text-align: center;
-    color: #7a7094;
-    font-size: 0.6rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    pointer-events: none;
-  }
-
-  .ad-rail__placeholder-size {
-    font-size: 0.75rem;
-    color: #a89bc4;
-    text-transform: none;
-  }
-
-  .ad-rail__slot.is-ad-loaded .ad-rail__placeholder {
-    display: none;
-  }
-
-  .ad-rail__slot ins {
-    display: block !important;
-    width: var(--ad-banner-w) !important;
-    height: var(--ad-banner-h) !important;
-    max-width: var(--ad-banner-w) !important;
-    max-height: var(--ad-banner-h) !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-  }
-
-  .ad-rail__slot iframe {
-    display: block !important;
-    width: var(--ad-banner-w) !important;
-    height: var(--ad-banner-h) !important;
-    max-width: var(--ad-banner-w) !important;
-    max-height: var(--ad-banner-h) !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    margin: 0 !important;
-    border: 0 !important;
+@media (max-width: 1023px) {
+  body.has-ad-rail .site-body {
+    display: block;
   }
 }

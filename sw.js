@@ -1,12 +1,11 @@
-const CACHE_NAME = "vixo-shell-v12";
+const CACHE_NAME = "vixo-shell-v16";
+
 const SHELL = [
   "index.html",
   "games/index.html",
-  "play.html",
   "about.html",
   "privacy.html",
   "404.html",
-  "ad-test.html",
   "css/styles.css",
   "css/kid-friendly.css",
   "css/fantasy-magic.css",
@@ -24,6 +23,10 @@ const SHELL = [
   "js/play.js",
   "logo/logo.png",
 ];
+
+const HTML_PATHS = new Set(SHELL.filter(function (p) {
+  return p.endsWith(".html");
+}));
 
 self.addEventListener("install", function (event) {
   event.waitUntil(
@@ -54,16 +57,19 @@ self.addEventListener("activate", function (event) {
 });
 
 self.addEventListener("fetch", function (event) {
-  const url = new URL(event.request.url);
+  var url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
   if (event.request.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      const network = fetch(event.request)
+  var path = url.pathname.replace(/^\//, "");
+  var isHtml = HTML_PATHS.has(path) || path.endsWith(".html");
+
+  if (isHtml) {
+    event.respondWith(
+      fetch(event.request)
         .then(function (response) {
           if (response && response.status === 200) {
-            const clone = response.clone();
+            var clone = response.clone();
             caches.open(CACHE_NAME).then(function (cache) {
               cache.put(event.request, clone);
             });
@@ -71,11 +77,28 @@ self.addEventListener("fetch", function (event) {
           return response;
         })
         .catch(function () {
-          return (
-            cached ||
-            caches.match("index.html") ||
-            caches.match("404.html")
-          );
+          return caches.match(event.request).then(function (cached) {
+            return cached || caches.match("index.html") || caches.match("404.html");
+          });
+        })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(function (cached) {
+      var network = fetch(event.request)
+        .then(function (response) {
+          if (response && response.status === 200) {
+            var clone = response.clone();
+            caches.open(CACHE_NAME).then(function (cache) {
+              cache.put(event.request, clone);
+            });
+          }
+          return response;
+        })
+        .catch(function () {
+          return cached;
         });
       return cached || network;
     })
