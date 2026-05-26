@@ -10,34 +10,29 @@ const FETCH_CHUNK_SIZE = 4;
 const FETCH_TIMEOUT_MS = 25000;
 
 /** Main catalog pages (loaded in two phases for fast first paint) */
-const INITIAL_MAIN_PAGES = 16;
-const QUICK_LOAD_PAGES = 5;
+const INITIAL_MAIN_PAGES = 6;
+const QUICK_LOAD_PAGES = 3;
 /** Per category row on homepage */
-const CATEGORY_PAGES_EACH = 3;
-const CATEGORY_BATCH_SIZE = 2;
+const CATEGORY_PAGES_EACH = 2;
+const CATEGORY_BATCH_SIZE = 3;
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
-const TRENDING_SHOW = 72;
-const NEW_SHOW = 56;
-const CATEGORY_INITIAL_SHOW = 12;
-const CATEGORY_LOAD_STEP = 12;
-const INITIAL_ALL_SHOW = 180;
+const TRENDING_SHOW = 16;
+const NEW_SHOW = 14;
+const CATEGORY_INITIAL_SHOW = 10;
+const CATEGORY_LOAD_STEP = 10;
+const INITIAL_ALL_SHOW = 32;
 
 const categorySectionState = new Map();
 
+/** Featured category rows on homepage (keeps layout clean) */
 const HOME_CATEGORIES = [
-  { slug: "multiplayer", title: "Multiplayer", icon: "👥", desc: "Play online with others" },
-  { slug: "battle", title: "Action & battle", icon: "⚔️", desc: "Fast combat and fights" },
-  { slug: "match-3", title: "Puzzle & match", icon: "🧩", desc: "Match, think, solve" },
-  { slug: "arcade", title: "Arcade classics", icon: "🕹️", desc: "Quick arcade fun" },
-  { slug: "simulation", title: "Simulation", icon: "🎮", desc: "Drive, build, simulate" },
-  { slug: "2048", title: "Brain & logic", icon: "🧠", desc: "Numbers and strategy" },
-  { slug: "kids", title: "Kids & casual", icon: "🌈", desc: "Easy games for everyone" },
-  { slug: "stickman", title: "Stickman", icon: "🏃", desc: "Stick figure action" },
-  { slug: "memory", title: "Memory & brain", icon: "💡", desc: "Remember and match" },
-  { slug: "sports", title: "Sports", icon: "⚽", desc: "Football, racing and more" },
-  { slug: "racing", title: "Racing", icon: "🏎️", desc: "Speed and driving games" },
-  { slug: "shooter", title: "Shooter", icon: "🎯", desc: "Aim and fire" },
+  { slug: "multiplayer", title: "Multiplayer", icon: "", desc: "Play online with friends" },
+  { slug: "battle", title: "Action", icon: "", desc: "Combat, adventure and battles" },
+  { slug: "match-3", title: "Puzzle", icon: "", desc: "Match, think and solve" },
+  { slug: "arcade", title: "Arcade", icon: "", desc: "Quick classics and high scores" },
+  { slug: "racing", title: "Racing", icon: "", desc: "Cars, speed and driving" },
+  { slug: "sports", title: "Sports", icon: "", desc: "Football, basketball and more" },
 ];
 
 let allGamesPage = INITIAL_MAIN_PAGES + 1;
@@ -221,7 +216,7 @@ function createGameCard(item, options = {}) {
   const rating = formatRating(item.quality_score);
 
   const article = document.createElement("article");
-  article.className = "game-card";
+  article.className = "game-card card-pop-done";
   article.dataset.category = item.category || "";
   article.dataset.title = (item.title || "").toLowerCase();
   if (item.namespace) article.dataset.namespace = item.namespace;
@@ -314,6 +309,11 @@ function appendGameCards(container, items, cardOptions, startIndex) {
   items.forEach(function (item, index) {
     container.appendChild(createGameCard(item, getOptions(item, base + index)));
   });
+
+  if (typeof window.vixoPrepareGameCards === "function") {
+    var section = container.closest(".game-section, .user-section");
+    if (section) window.vixoPrepareGameCards(section);
+  }
 }
 
 function categoryCardOptions(item, index) {
@@ -442,7 +442,7 @@ function createCategoryPlaceholder(config) {
   section.innerHTML = `
     <div class="section-head">
       <div>
-        <h2>${config.icon} ${config.title}</h2>
+        <h2>${config.title}</h2>
         <p class="section-desc">${config.desc}</p>
       </div>
       <span class="section-count">Loading…</span>
@@ -514,7 +514,7 @@ function createCategorySection(config, items) {
   section.innerHTML = `
     <div class="section-head">
       <div>
-        <h2>${config.icon} ${config.title}</h2>
+        <h2>${config.title}</h2>
         <p class="section-desc">${config.desc}</p>
       </div>
       <span class="see-all section-count-inline">Showing ${initialCount} games</span>
@@ -595,6 +595,11 @@ function appendAllGames(items, replace) {
     grid.appendChild(createGameCard(item, { showFavorite: true }));
   });
 
+  if (typeof window.vixoPrepareGameCards === "function") {
+    var allSection = document.getElementById("library");
+    if (allSection) window.vixoPrepareGameCards(allSection);
+  }
+
   if (typeof applyAllGamesLibraryView === "function") {
     const sortEl = document.getElementById("sort-all");
     if (sortEl && sortEl.value !== "popular") {
@@ -664,7 +669,7 @@ function applyHomepageCatalog(allPages, categoryResults) {
 
   const trending = allPages.slice(0, TRENDING_SHOW);
   renderGameCards(trendingGrid, trending, function (item, index) {
-    return { tag: index < 3 ? "hot" : null, large: index === 0, showFavorite: true };
+    return { tag: index < 2 ? "hot" : null, large: false, showFavorite: true };
   });
   setSectionCount("count-trending", trending.length);
 
@@ -678,7 +683,7 @@ function applyHomepageCatalog(allPages, categoryResults) {
             Math.floor(TRENDING_SHOW / 2) + NEW_SHOW
           );
       renderGameCards(newGrid, newList, function (item, index) {
-        return { tag: index < 2 ? "new" : null, large: index === 0, showFavorite: true };
+        return { tag: index < 2 ? "new" : null, large: false, showFavorite: true };
       });
     setSectionCount("count-new", newGrid.querySelectorAll(".game-card").length);
   }

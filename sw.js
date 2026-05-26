@@ -12,6 +12,7 @@ const SHELL = [
   "css/fantasy-magic.css",
   "css/kid-animations.css",
   "css/ads.css",
+  "css/home-pro.css",
   "js/routes.js",
   "js/animations.js",
   "js/magic-bg.js",

@@ -32,10 +32,11 @@
   <link rel="preconnect" href="https://img.gamepix.com" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=8" />
-  <link rel="stylesheet" href="css/kid-friendly.css?v=2" />
+  <link rel="stylesheet" href="css/kid-friendly.css?v=3" />
   <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
-  <link rel="stylesheet" href="css/kid-animations.css?v=1" />
+  <link rel="stylesheet" href="css/kid-animations.css?v=2" />
   <link rel="stylesheet" href="css/ads.css?v=9" />
+  <link rel="stylesheet" href="css/home-pro.css?v=1" />
   <link rel="preconnect" href="https://www.highperformanceformat.com" crossorigin />
 </head>
 <body class="has-ad-rail">
@@ -106,17 +107,17 @@
   </header>
 
   <main class="home-main">
-    <section class="hero hero--home" aria-labelledby="hero-title">
+    <section class="hero hero--home hero--pro" aria-labelledby="hero-title">
       <div class="hero-content">
-        <span class="hero-badge" id="hero-badge">Free to play</span>
-        <h1 id="hero-title">Play the best free games</h1>
-        <p class="hero-desc" id="hero-desc">Instant fun in your browser — no download, no account. Pick a game and press play.</p>
+        <p class="hero-eyebrow">VixoGames · Free browser games</p>
+        <h1 id="hero-title">Play instantly. No download.</h1>
+        <p class="hero-desc" id="hero-desc">Curated free games in your browser — no account, no install. Pick a title and start playing in seconds.</p>
         <div class="hero-actions">
           <a href="#trending" id="hero-play" class="btn btn-primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-            Browse games
+            Start playing
           </a>
-          <a href="#cat-multiplayer" class="btn btn-ghost">Multiplayer</a>
+          <a href="#library" class="btn btn-ghost">Browse library</a>
         </div>
       </div>
       <div class="hero-visual" aria-hidden="true">
@@ -128,26 +129,33 @@
       </div>
     </section>
 
-    <div class="home-stats" id="home-stats" aria-live="polite">
-      <div class="stat-pill"><strong id="stat-total">—</strong><span>games ready</span></div>
-      <div class="stat-pill"><strong>100%</strong><span>free</span></div>
-      <div class="stat-pill"><strong>0</strong><span>downloads</span></div>
-      <div class="stat-pill"><strong id="stat-categories">12+</strong><span>categories</span></div>
+    <div class="home-stats home-stats--pro" id="home-stats" aria-live="polite">
+      <div class="stat-pill"><strong id="stat-total">—</strong><span>games in library</span></div>
+      <div class="stat-pill"><strong>100%</strong><span>free to play</span></div>
+      <div class="stat-pill"><strong id="stat-categories">6</strong><span>featured categories</span></div>
     </div>
 
-    <section class="categories categories--home" aria-label="Filter by category">
+    <section class="browse-categories" aria-label="Browse by category">
+      <h2 class="browse-categories__title">Browse by category</h2>
+      <div class="browse-categories__grid">
+        <a href="#cat-multiplayer" class="browse-card"><span class="browse-card__label">Multiplayer</span><span class="browse-card__meta">Online</span></a>
+        <a href="#cat-battle" class="browse-card"><span class="browse-card__label">Action</span><span class="browse-card__meta">Combat</span></a>
+        <a href="#cat-match-3" class="browse-card"><span class="browse-card__label">Puzzle</span><span class="browse-card__meta">Brain games</span></a>
+        <a href="#cat-arcade" class="browse-card"><span class="browse-card__label">Arcade</span><span class="browse-card__meta">Classics</span></a>
+        <a href="#cat-racing" class="browse-card"><span class="browse-card__label">Racing</span><span class="browse-card__meta">Driving</span></a>
+        <a href="#cat-sports" class="browse-card"><span class="browse-card__label">Sports</span><span class="browse-card__meta">Ball games</span></a>
+      </div>
+    </section>
+
+    <section class="quick-filters categories categories--home" aria-label="Filter games on page">
+      <p class="quick-filters__label">Quick filter</p>
       <div class="categories-scroll">
-        <button type="button" class="cat-chip active" data-filter="all">All games</button>
-        <button type="button" class="cat-chip" data-filter="trending">🔥 Trending</button>
-        <button type="button" class="cat-chip" data-filter="multiplayer">👥 Multiplayer</button>
-        <button type="button" class="cat-chip" data-filter="battle">⚔️ Action</button>
-        <button type="button" class="cat-chip" data-filter="match-3">🧩 Puzzle</button>
-        <button type="button" class="cat-chip" data-filter="arcade">🕹️ Arcade</button>
-        <button type="button" class="cat-chip" data-filter="simulation">🚗 Simulation</button>
-        <button type="button" class="cat-chip" data-filter="2048">🧠 Brain</button>
-        <button type="button" class="cat-chip" data-filter="kids">🌈 Kids</button>
-        <button type="button" class="cat-chip" data-filter="stickman">🏃 Stickman</button>
-        <button type="button" class="cat-chip" data-filter="memory">💡 Memory</button>
+        <button type="button" class="cat-chip active" data-filter="all">All</button>
+        <button type="button" class="cat-chip" data-filter="trending">Trending</button>
+        <button type="button" class="cat-chip" data-filter="multiplayer">Multiplayer</button>
+        <button type="button" class="cat-chip" data-filter="battle">Action</button>
+        <button type="button" class="cat-chip" data-filter="match-3">Puzzle</button>
+        <button type="button" class="cat-chip" data-filter="arcade">Arcade</button>
       </div>
     </section>
 
@@ -159,7 +167,7 @@
     <section id="play-again" class="game-section user-section is-hidden" data-section>
       <div class="section-head">
         <div>
-          <h2>▶ Play again</h2>
+          <h2>Play again</h2>
           <p class="section-desc">Jump back into your last game</p>
         </div>
       </div>
@@ -169,7 +177,7 @@
     <section id="favorites" class="game-section game-section--alt user-section is-hidden" data-section>
       <div class="section-head">
         <div>
-          <h2>♥ Your favorites</h2>
+          <h2>Your favorites</h2>
           <p class="section-desc">Games you saved with the heart icon</p>
         </div>
       </div>
@@ -179,7 +187,7 @@
     <section id="recent-games" class="game-section user-section is-hidden" data-section>
       <div class="section-head">
         <div>
-          <h2>🕐 Recently played</h2>
+          <h2>Recently played</h2>
           <p class="section-desc">Pick up where you left off</p>
         </div>
       </div>
@@ -189,32 +197,32 @@
     <section id="trending" class="game-section" data-section>
       <div class="section-head">
         <div>
-          <h2>🔥 Trending now</h2>
-          <p class="section-desc">Top picks players love this week</p>
+          <h2>Trending now</h2>
+          <p class="section-desc">Popular picks right now — scroll sideways for more</p>
         </div>
         <span class="section-count" id="count-trending"></span>
       </div>
-      <div class="game-grid game-grid--dense" id="gamepix-trending" aria-live="polite"></div>
+      <div class="game-grid game-grid--row game-grid--featured" id="gamepix-trending" aria-live="polite"></div>
     </section>
 
     <section id="new" class="game-section game-section--alt" data-section>
       <div class="section-head">
         <div>
-          <h2>✨ New & fresh</h2>
-          <p class="section-desc">Recently added to the catalog</p>
+          <h2>New this week</h2>
+          <p class="section-desc">Fresh titles added to the catalog</p>
         </div>
         <span class="section-count" id="count-new"></span>
       </div>
-      <div class="game-grid game-grid--dense game-grid--spotlight" id="gamepix-new" aria-live="polite"></div>
+      <div class="game-grid game-grid--row" id="gamepix-new" aria-live="polite"></div>
     </section>
 
     <div id="category-sections" class="category-sections"></div>
 
-    <section id="all-games" class="game-section" data-section>
+    <section id="library" class="game-section game-section--library" data-section>
       <div class="section-head section-head--stack">
         <div>
-          <h2>🎮 Explore all games</h2>
-          <p class="section-desc">Even more titles from the full library</p>
+          <h2>Full game library</h2>
+          <p class="section-desc">Search, sort and load more — the complete catalog lives here</p>
         </div>
         <div class="library-controls" aria-label="Sort and filter library">
           <label class="library-control">
@@ -244,7 +252,7 @@
         </div>
         <span class="section-count" id="count-all"></span>
       </div>
-      <div class="game-grid game-grid--dense" id="gamepix-all" aria-live="polite"></div>
+      <div class="game-grid game-grid--dense game-grid--catalog" id="gamepix-all" aria-live="polite"></div>
       <div class="load-more-wrap">
         <button type="button" class="btn btn-primary btn-load-more" id="load-more" hidden>
           Load more games
@@ -265,7 +273,7 @@
         <h4>Explore</h4>
         <a href="#trending">Trending</a>
         <a href="#new">New games</a>
-        <a href="#all-games">All games</a>
+        <a href="#library">Full library</a>
       </div>
       <div>
         <h4>Categories</h4>
@@ -285,15 +293,15 @@
         <a href="#trending">Start playing</a>
       </div>
     </div>
-    <p class="footer-copy">© 2026 VixoGames · Games powered by GamePix · <span class="site-version">v8</span></p>
+    <p class="footer-copy">© 2026 VixoGames · Games powered by GamePix · <span class="site-version">v9</span></p>
   </footer>
 
   <script src="js/routes.js?v=4" defer></script>
   <script src="js/storage.js?v=3" defer></script>
-  <script src="js/ui.js?v=7" defer></script>
-  <script src="js/gamepix.js?v=10" defer></script>
+  <script src="js/ui.js?v=8" defer></script>
+  <script src="js/gamepix.js?v=12" defer></script>
   <script src="js/magic-bg.js?v=2" defer></script>
-  <script src="js/animations.js?v=3" defer></script>
+  <script src="js/animations.js?v=4" defer></script>
   <script src="js/home.js?v=2" defer></script>
 </body>
 </html>

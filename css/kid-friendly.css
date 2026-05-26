@@ -189,8 +189,8 @@ main,
 /* ─── Scroll-in sections (JS adds .is-visible) ─── */
 .game-section.reveal-pending,
 .user-section.reveal-pending {
-  opacity: 0;
-  transform: translateY(28px);
+  opacity: 1;
+  transform: translateY(20px);
 }
 
 .game-section.reveal-pending.is-visible,
@@ -277,7 +277,7 @@ main,
     transition: box-shadow 0.2s ease, transform 0.25s ease;
   }
 
-  .game-card:hover .game-card-link {
+  .game-card.card-pop-done:hover .game-card-link {
     box-shadow:
       0 6px 20px rgba(124, 58, 237, 0.35),
       0 calc(var(--kid-depth) + 1px) 0 rgba(76, 29, 149, 0.55);
@@ -308,7 +308,7 @@ main,
   }
 
   .game-section.reveal-pending.is-visible {
-    transition: opacity 0.55s ease, transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
+    transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
   }
 
   .similar-card {

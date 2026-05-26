@@ -1,5 +1,5 @@
 /**
- * Scroll reveals, staggered game cards, favorite heart burst
+ * Scroll reveals + stable game card hover (no opacity pop-in)
  */
 document.addEventListener("DOMContentLoaded", function () {
   var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sections.forEach(function (el) {
       el.classList.add("is-visible");
     });
+    prepareAllGameCards();
     return;
   }
 
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var title = section.querySelector(".section-head h2");
         if (title) title.classList.add("is-visible");
 
-        staggerGameCards(section);
+        prepareGameCardsInSection(section);
         sectionObserver.unobserve(section);
       });
     },
@@ -41,6 +42,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (el.dataset.animWired === "1") return;
       el.dataset.animWired = "1";
       sectionObserver.observe(el);
+      if (el.classList.contains("is-visible")) {
+        prepareGameCardsInSection(el);
+      }
     });
   }
 
@@ -49,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     sections.forEach(function (el) {
       el.classList.add("is-visible");
-      staggerGameCards(el);
+      prepareGameCardsInSection(el);
     });
   }
 
@@ -58,6 +62,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("vixo:games-loaded", wireSections);
   document.addEventListener("vixo:category-mounted", wireSections);
+  document.addEventListener("vixo:games-loaded", prepareAllGameCards);
+  document.addEventListener("vixo:category-mounted", prepareAllGameCards);
 
   document.body.addEventListener("click", function (e) {
     var btn = e.target.closest(".game-fav-btn");
@@ -66,40 +72,22 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-function markCardPopDone(card) {
+function prepareGameCard(card) {
   card.classList.remove("card-pop-in");
   card.classList.add("card-pop-done");
+  card.style.removeProperty("--pop-delay");
 }
 
-function wireCardPopAnimation(card, index) {
-  if (card.classList.contains("card-pop-done") || card.classList.contains("card-pop-in")) {
-    return;
-  }
-
-  var delaySec = Math.min(index * 0.04, 1.2);
-  card.classList.add("card-pop-in");
-  card.style.setProperty("--pop-delay", delaySec + "s");
-
-  function onEnd(e) {
-    if (e.animationName !== "card-pop-in") return;
-    markCardPopDone(card);
-    card.removeEventListener("animationend", onEnd);
-  }
-
-  card.addEventListener("animationend", onEnd);
-  window.setTimeout(function () {
-    if (!card.classList.contains("card-pop-done")) {
-      markCardPopDone(card);
-    }
-  }, delaySec * 1000 + 650);
+function prepareGameCardsInSection(section) {
+  if (!section) return;
+  section.querySelectorAll(".game-card").forEach(prepareGameCard);
 }
 
-function staggerGameCards(section) {
-  var cards = section.querySelectorAll(".game-card");
-  cards.forEach(function (card, i) {
-    wireCardPopAnimation(card, i);
-  });
+function prepareAllGameCards() {
+  document.querySelectorAll(".game-card").forEach(prepareGameCard);
 }
+
+window.vixoPrepareGameCards = prepareGameCardsInSection;
 
 function burstFavorite(btn) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

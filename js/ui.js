@@ -296,7 +296,7 @@ function initSearchDropdown() {
   if (moreBtn) {
     moreBtn.addEventListener("click", function () {
       setDropdownOpen(false);
-      const all = document.getElementById("all-games");
+      const all = document.getElementById("library");
       if (all) {
         all.scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -582,11 +582,11 @@ function filterGamesByChip(filter) {
     card.style.display = show ? "" : "none";
   });
 
-  const allSection = document.getElementById("all-games");
+  const allSection = document.getElementById("library");
   if (allSection && filter !== "trending") {
     allSection.classList.remove("is-section-hidden");
     cards.forEach(function (card) {
-      if (!card.closest("#all-games")) return;
+      if (!card.closest("#library")) return;
       const cat = (card.dataset.category || "").toLowerCase();
       const show =
         cat === filter ||
