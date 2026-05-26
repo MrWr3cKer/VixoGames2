@@ -1,5 +1,5 @@
 /**
- * Keeps Adsterra iframe inside the left rail slot (invoke.js may inject elsewhere).
+ * Moves the real Adsterra iframe into the left holder (scripts stay on <body>).
  */
 (function () {
   const SLOT_ID = "adsterra-slot";
@@ -9,49 +9,70 @@
     return document.getElementById(SLOT_ID);
   }
 
+  function isAdNode(node) {
+    if (!node || node.nodeType !== 1) return false;
+    if (node.tagName === "IFRAME") return true;
+    if (node.tagName === "DIV" && node.querySelector("iframe")) return true;
+    return false;
+  }
+
   function markFilled(slot) {
     if (slot && slot.querySelector("iframe")) {
       slot.classList.add("ad-rail__slot--filled");
     }
   }
 
-  function adoptIframe(iframe) {
+  function adoptNode(node) {
     const slot = getSlot();
-    if (!slot || !iframe || slot.contains(iframe)) {
+    if (!slot || !node || slot.contains(node)) {
       markFilled(getSlot());
       return;
     }
-    slot.appendChild(iframe);
+    if (node.tagName === "IFRAME") {
+      slot.insertBefore(node, slot.firstChild);
+    } else {
+      slot.insertBefore(node, slot.firstChild);
+    }
     markFilled(slot);
   }
 
-  function collectIframes() {
+  function collectAdNodes() {
     const slot = getSlot();
     if (!slot) return;
 
     document.querySelectorAll(`script[src*="${INVOKE_KEY}"]`).forEach((script) => {
       let el = script.nextElementSibling;
-      while (el && el !== slot) {
-        if (el.tagName === "IFRAME") {
-          adoptIframe(el);
+      while (el) {
+        if (el.id === SLOT_ID || el.classList.contains("ad-rail")) break;
+        if (isAdNode(el)) {
+          adoptNode(el);
           return;
         }
         el = el.nextElementSibling;
       }
     });
 
-    document.querySelectorAll("body > iframe").forEach(adoptIframe);
+    document.querySelectorAll("body > iframe, body > div").forEach((el) => {
+      if (el.closest(".ad-rail")) return;
+      if (el.tagName === "IFRAME") {
+        adoptNode(el);
+      } else if (
+        el.tagName === "DIV" &&
+        el.querySelector(`iframe[src*="${INVOKE_KEY}"], iframe[src*="highperformanceformat"]`)
+      ) {
+        adoptNode(el);
+      }
+    });
+
     markFilled(slot);
   }
 
   document.body.classList.add("has-ad-rail");
 
-  const observer = new MutationObserver(collectIframes);
+  const observer = new MutationObserver(collectAdNodes);
   observer.observe(document.body, { childList: true, subtree: true });
 
-  collectIframes();
-  window.addEventListener("load", collectIframes);
-  setTimeout(collectIframes, 500);
-  setTimeout(collectIframes, 3000);
-  setTimeout(collectIframes, 15000);
+  collectAdNodes();
+  window.addEventListener("load", collectAdNodes);
+  [300, 800, 2000, 5000, 15000, 30000].forEach((ms) => setTimeout(collectAdNodes, ms));
 })();
