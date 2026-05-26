@@ -108,8 +108,8 @@
   body.has-ad-rail .page-content .home-main,
   body.has-ad-rail .page-content .static-page,
   body.has-ad-rail .page-content .play-layout {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   body.has-ad-rail .page-content .site-footer {
@@ -177,8 +177,8 @@
   body.has-ad-rail .page-content .home-main,
   body.has-ad-rail .page-content .static-page,
   body.has-ad-rail .page-content .play-layout {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   .ad-rail--right {
