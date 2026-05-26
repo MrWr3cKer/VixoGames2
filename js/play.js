@@ -406,6 +406,58 @@ function initGameFocus() {
   });
 }
 
+var SMARTLINK_URL =
+  "https://data527.click/6e6df467db5c83467f9c/9cc0e62529/?placementName=default";
+var SMARTLINK_STORAGE_KEY = "vixo-smartlink-at";
+var SMARTLINK_COOLDOWN_MS = 4 * 60 * 60 * 1000;
+
+function isMobileOrTabletUser() {
+  var ua = navigator.userAgent || "";
+
+  if (/iPad/.test(ua)) return true;
+  if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
+  if (/iPhone|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
+    return true;
+  }
+
+  var desktopLike = window.matchMedia(
+    "(min-width: 1024px) and (hover: hover) and (pointer: fine)"
+  ).matches;
+  if (desktopLike) return false;
+
+  return (
+    window.matchMedia("(max-width: 1023px)").matches &&
+    (window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0)
+  );
+}
+
+function canOpenSmartlink() {
+  try {
+    var last = parseInt(localStorage.getItem(SMARTLINK_STORAGE_KEY), 10);
+    if (last && !isNaN(last) && Date.now() - last < SMARTLINK_COOLDOWN_MS) {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function markSmartlinkOpened() {
+  try {
+    localStorage.setItem(SMARTLINK_STORAGE_KEY, String(Date.now()));
+  } catch (e) {}
+}
+
+function maybeOpenSmartlinkOnFullscreen() {
+  if (!isMobileOrTabletUser() || !canOpenSmartlink()) return;
+
+  var opened = window.open(SMARTLINK_URL, "_blank", "noopener,noreferrer");
+  if (opened) {
+    markSmartlinkOpened();
+  }
+}
+
 function initFullscreen() {
   const btn = document.getElementById("btn-fullscreen");
   const stage = document.getElementById("game-stage");
@@ -428,6 +480,7 @@ function initFullscreen() {
     if (document.fullscreenElement === stage) {
       document.exitFullscreen();
     } else {
+      maybeOpenSmartlinkOnFullscreen();
       stage.requestFullscreen().catch(function () {
         stage.classList.toggle("is-fullscreen-fallback");
       });
