@@ -1,57 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18191403026"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'AW-18191403026');
-  </script>
-  <!-- Event snippet for Sidevisning conversion page -->
-  <script>
-    gtag('event', 'conversion', {
-        'send_to': 'AW-18191403026/Ned0CP_7_7McEJKQq-JD',
-        'value': 1.0,
-        'currency': 'NOK'
-    });
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adsterra test – VixoGames</title>
-  <link rel="stylesheet" href="css/ads.css?v=9" />
+  <title>Ad slot test – VixoGames</title>
+  <link rel="stylesheet" href="css/ads.css?v=11" />
+  <link rel="preconnect" href="https://data527.click" crossorigin />
   <style>
     body {
       margin: 0;
       font-family: system-ui, sans-serif;
       background: #0c0a14;
       color: #f4f0ff;
-      padding: 2rem 2rem 2rem 12rem;
+      padding: 2rem 2rem 2rem 11rem;
     }
     p { max-width: 520px; line-height: 1.6; }
   </style>
 </head>
 <body class="has-ad-rail">
   <aside class="ad-rail" aria-label="Advertisement">
-    <div class="ad-rail__slot" id="adsterra-slot">
-      <script>
-        atOptions = {
-          'key' : 'c7f791b56299129e9f1ed08bf70c3a5e',
-          'format' : 'iframe',
-          'height' : 600,
-          'width' : 160,
-          'params' : {}
-        };
-      </script>
-      <script src="https://www.highperformanceformat.com/c7f791b56299129e9f1ed08bf70c3a5e/invoke.js"></script>
+    <div class="ad-rail__slot" id="ad-slot">
+      <div class="ad-rail__placeholder" aria-hidden="true">
+        <span>Ad space</span>
+        <span class="ad-rail__placeholder-size">120 × 600</span>
+      </div>
+      <ins style="width: 120px;height:600px" data-width="120" data-height="600" class="u27eb8fe8d3" data-domain="//data527.click" data-affquery="/ed3ecbae9a77159e4e93/27eb8fe8d3/?placementName=Banner1"><script src="https://data527.click/js/responsive.js" async></script></ins>
     </div>
   </aside>
 
-  <h1>Adsterra test</h1>
-  <p>If Adsterra is serving, you see the <strong>real banner</strong> in the left box — not only “Ad loading…”.</p>
-  <p>Turn off ad blocker. Use <strong>https://vixogames.com</strong>. New zones may take 5–30 minutes.</p>
+  <h1>Ad test</h1>
+  <p>Fixed 120×600 banner on the left. Scroll — it should stay in place.</p>
   <p><a href="index.html" style="color:#a855f7">← Home</a></p>
+  <script src="js/ad-slot.js?v=1" defer></script>
 </body>
 </html>

@@ -28,8 +28,19 @@
   <link rel="stylesheet" href="css/kid-friendly.css?v=2" />
   <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
   <link rel="stylesheet" href="css/kid-animations.css?v=1" />
+  <link rel="stylesheet" href="css/ads.css?v=11" />
+  <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
-<body>
+<body class="has-ad-rail">
+  <aside class="ad-rail" aria-label="Advertisement">
+    <div class="ad-rail__slot" id="ad-slot">
+      <div class="ad-rail__placeholder" aria-hidden="true">
+        <span>Ad space</span>
+        <span class="ad-rail__placeholder-size">120 × 600</span>
+      </div>
+      <ins style="width: 120px;height:600px" data-width="120" data-height="600" class="u27eb8fe8d3" data-domain="//data527.click" data-affquery="/ed3ecbae9a77159e4e93/27eb8fe8d3/?placementName=Banner1"><script src="https://data527.click/js/responsive.js" async></script></ins>
+    </div>
+  </aside>
   <div class="bg-glow bg-glow--fantasy" aria-hidden="true"></div>
   <div class="magic-ripples" id="magic-ripples" aria-hidden="true"></div>
   <header class="site-header">
@@ -44,7 +55,7 @@
     <h2>Third-party games (GamePix)</h2>
     <p>When you play a game, it loads from <strong>play.gamepix.com</strong> inside an iframe. GamePix may use its own cookies or storage according to their policies. We do not control that embedded experience.</p>
     <h2>Analytics &amp; ads</h2>
-    <p>We do not currently inject third-party analytics or ad trackers on the VixoGames site. If that changes, this page will be updated.</p>
+    <p>We use <strong>Google Ads</strong> tags for conversion measurement. A third-party ad partner may show banner ads on desktop; they may use cookies or similar tech per their own policy.</p>
     <h2>Offline cache</h2>
     <p>A small <strong>service worker</strong> may cache static files (HTML, CSS, JS) so the site shell can load faster or work offline for navigation. Game feeds and players still need an internet connection.</p>
     <h2>Children</h2>
@@ -54,6 +65,7 @@
   <footer class="site-footer site-footer--static">
     <p class="footer-copy">© 2026 VixoGames · Last updated May 2026</p>
   </footer>
+  <script src="js/ad-slot.js?v=1" defer></script>
   <script src="js/magic-bg.js?v=2" defer></script>
 </body>
 </html>

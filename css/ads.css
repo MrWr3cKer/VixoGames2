@@ -1,75 +1,102 @@
 /**
- * Fixed left Adsterra skyscraper — desktop only, vertically centered
+ * Fixed left banner slot (120×600) — stays on screen while page scrolls
  */
 
 :root {
-  --ad-rail-w: 176px;
-  --ad-banner-w: 160px;
+  --ad-rail-w: 144px;
+  --ad-banner-w: 120px;
   --ad-banner-h: 600px;
 }
 
 .ad-rail {
-  display: flex;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: var(--ad-rail-w);
-  height: 100vh;
-  height: 100dvh;
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    rgba(12, 10, 20, 0.94) 0%,
-    rgba(12, 10, 20, 0.78) 75%,
-    transparent 100%
-  );
-  border-right: 1px solid rgba(168, 85, 247, 0.12);
+  display: none;
 }
 
 @media (min-width: 1280px) {
   body.has-ad-rail {
     padding-left: var(--ad-rail-w);
   }
-}
 
-.ad-rail__slot {
-  position: relative;
-  pointer-events: auto;
-  width: var(--ad-banner-w);
-  /* On small screens, allow the banner to be cropped instead of hiding entirely. */
-  height: min(var(--ad-banner-h), calc(100dvh - 24px));
-  flex-shrink: 0;
-  overflow: hidden;
-  border-radius: 12px;
-  background: rgba(18, 14, 28, 0.95);
-  border: 1px solid rgba(168, 85, 247, 0.22);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    0 0 24px rgba(139, 92, 246, 0.08);
-}
+  .ad-rail {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--ad-rail-w);
+    height: 100vh;
+    height: 100dvh;
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(12, 10, 20, 0.94) 0%,
+      rgba(12, 10, 20, 0.78) 75%,
+      transparent 100%
+    );
+    border-right: 1px solid rgba(168, 85, 247, 0.12);
+  }
 
-.ad-rail__slot iframe,
-.ad-rail__slot > div {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  border: 0 !important;
-  margin: 0 !important;
-  background: transparent;
-}
-
-@media (min-width: 1280px) {
   .ad-rail__slot {
+    position: relative;
+    pointer-events: auto;
+    width: var(--ad-banner-w);
     height: var(--ad-banner-h);
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    background: rgba(18, 14, 28, 0.95);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  }
+
+  .ad-rail__placeholder {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    text-align: center;
+    color: #8b7faa;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .ad-rail__placeholder-size {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #b8aed4;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .ad-rail__slot.is-ad-loaded .ad-rail__placeholder {
+    display: none;
+  }
+
+  .ad-rail__slot ins {
+    display: block !important;
+    width: var(--ad-banner-w) !important;
+    height: var(--ad-banner-h) !important;
+    max-width: var(--ad-banner-w);
+    max-height: var(--ad-banner-h);
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .ad-rail__slot iframe {
+    display: block;
+    max-width: var(--ad-banner-w);
+    border: 0;
   }
 }
-
