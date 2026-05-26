@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirecting…</title>
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      var g = q.get("game");
+      var base = location.pathname.replace(/[^/]*$/, "");
+      if (g) {
+        location.replace(base + "games/" + encodeURIComponent(g));
+      } else {
+        location.replace(base + "index.html");
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting to game… <a href="index.html">Home</a></p>
+</body>
+</html>

@@ -1,0 +1,494 @@
+/**
+ * Extra playful animations for kids — respects prefers-reduced-motion
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  .card-pop-in,
+  .game-fav-btn.is-active,
+  .game-tag,
+  .hero-badge,
+  .play-btn {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ── Favorite heart (the one you liked!) ── */
+  .game-fav-btn svg {
+    transition: transform 0.25s cubic-bezier(0.34, 1.5, 0.64, 1);
+  }
+
+  .game-fav-btn:hover {
+    transform: scale(1.2) rotate(-10deg);
+    background: rgba(236, 72, 153, 0.55);
+    box-shadow: 0 0 18px rgba(244, 114, 182, 0.65);
+    animation: fav-heart-hover 0.45s ease;
+  }
+
+  .game-fav-btn:hover svg {
+    transform: scale(1.15);
+  }
+
+  @keyframes fav-heart-hover {
+    0% {
+      transform: scale(1) rotate(0);
+    }
+    35% {
+      transform: scale(1.28) rotate(-14deg);
+    }
+    65% {
+      transform: scale(1.15) rotate(6deg);
+    }
+    100% {
+      transform: scale(1.2) rotate(-10deg);
+    }
+  }
+
+  .game-fav-btn.is-active {
+    animation: fav-heart-pulse 1.4s ease-in-out infinite;
+  }
+
+  .game-fav-btn.is-active svg {
+    filter: drop-shadow(0 0 6px rgba(244, 114, 182, 0.8));
+  }
+
+  @keyframes fav-heart-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 rgba(244, 114, 182, 0);
+    }
+    50% {
+      transform: scale(1.08);
+      box-shadow: 0 0 14px rgba(244, 114, 182, 0.5);
+    }
+  }
+
+  .game-fav-btn.is-bursting {
+    animation: fav-heart-burst 0.55s cubic-bezier(0.34, 1.6, 0.64, 1);
+  }
+
+  @keyframes fav-heart-burst {
+    0% {
+      transform: scale(1);
+    }
+    30% {
+      transform: scale(1.5) rotate(15deg);
+    }
+    60% {
+      transform: scale(1.2) rotate(-8deg);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .fav-particle {
+    position: fixed;
+    z-index: 200;
+    font-size: 0.85rem;
+    pointer-events: none;
+    animation: fav-particle-fly 0.65s ease-out forwards;
+  }
+
+  @keyframes fav-particle-fly {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(0.4);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(
+          calc(-50% + var(--fly-x, 0px)),
+          calc(-50% + var(--fly-y, -30px))
+        )
+        scale(1.2);
+    }
+  }
+
+  /* ── Game cards pop in (stagger via --pop-delay) ── */
+  .game-card.card-pop-in {
+    animation: card-pop-in 0.55s cubic-bezier(0.34, 1.35, 0.64, 1) both;
+    animation-delay: var(--pop-delay, 0s);
+  }
+
+  @keyframes card-pop-in {
+    0% {
+      opacity: 0;
+      transform: translateY(22px) scale(0.88);
+    }
+    70% {
+      transform: translateY(-4px) scale(1.03);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .game-card:hover {
+    transform: translateY(-6px) rotate(-1deg);
+    animation: card-wiggle-hover 0.5s ease;
+  }
+
+  @keyframes card-wiggle-hover {
+    0%,
+    100% {
+      transform: translateY(-6px) rotate(-1deg);
+    }
+    25% {
+      transform: translateY(-7px) rotate(1deg);
+    }
+    75% {
+      transform: translateY(-5px) rotate(-2deg);
+    }
+  }
+
+  .game-card-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    opacity: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 65%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+
+  .game-card:hover .game-card-link::before {
+    animation: card-shine 0.65s ease;
+  }
+
+  @keyframes card-shine {
+    0% {
+      opacity: 0;
+      transform: translateX(-120%);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(120%);
+    }
+  }
+
+  .game-card-link:hover .game-thumb-img {
+    transform: scale(1.08) rotate(2deg);
+  }
+
+  .game-card-link:hover .play-btn {
+    animation: play-btn-bounce 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  @keyframes play-btn-bounce {
+    0% {
+      transform: translateY(8px) scale(0.9);
+    }
+    50% {
+      transform: translateY(-2px) scale(1.12);
+    }
+    100% {
+      transform: translateY(0) scale(1.08);
+    }
+  }
+
+  .game-tag.hot {
+    animation: tag-hot-bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes tag-hot-bounce {
+    0%,
+    100% {
+      transform: scale(1) rotate(0);
+    }
+    15% {
+      transform: scale(1.08) rotate(-4deg);
+    }
+    30% {
+      transform: scale(1) rotate(4deg);
+    }
+  }
+
+  .game-tag.new {
+    animation: tag-new-blink 2.5s ease-in-out infinite;
+  }
+
+  @keyframes tag-new-blink {
+    0%,
+    100% {
+      box-shadow: 0 0 0 rgba(163, 230, 53, 0);
+    }
+    50% {
+      box-shadow: 0 0 12px rgba(163, 230, 53, 0.7);
+    }
+  }
+
+  /* ── Hero & stats ── */
+  .hero-badge {
+    animation: badge-float 2.8s ease-in-out infinite;
+  }
+
+  @keyframes badge-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .hero-card-play {
+    animation: featured-play-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes featured-play-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.06);
+    }
+  }
+
+  .hero:hover .hero-card-play {
+    animation: none;
+    transform: scale(1.1);
+  }
+
+  .stat-pill:hover strong {
+    animation: stat-number-pop 0.4s cubic-bezier(0.34, 1.5, 0.64, 1);
+    display: inline-block;
+  }
+
+  @keyframes stat-number-pop {
+    50% {
+      transform: scale(1.2);
+      color: var(--accent-lime);
+    }
+  }
+
+  /* ── Chips & buttons ── */
+  .cat-chip:hover {
+    animation: chip-wiggle 0.35s ease;
+  }
+
+  .cat-chip.active {
+    animation: chip-active-pop 2s ease-in-out infinite;
+  }
+
+  @keyframes chip-wiggle {
+    0%,
+    100% {
+      transform: translateY(-2px) rotate(0);
+    }
+    33% {
+      transform: translateY(-3px) rotate(-3deg);
+    }
+    66% {
+      transform: translateY(-3px) rotate(3deg);
+    }
+  }
+
+  @keyframes chip-active-pop {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.04);
+    }
+  }
+
+  .btn-primary:hover {
+    animation: btn-primary-glow 0.6s ease;
+  }
+
+  @keyframes btn-primary-glow {
+    0% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.15);
+    }
+    100% {
+      filter: brightness(1.05);
+    }
+  }
+
+  .btn-load-more:not(:disabled):hover {
+    animation: load-more-wiggle 0.45s ease;
+  }
+
+  @keyframes load-more-wiggle {
+    0%,
+    100% {
+      transform: translateY(-2px) rotate(0);
+    }
+    25% {
+      transform: translateY(-3px) rotate(-2deg);
+    }
+    75% {
+      transform: translateY(-3px) rotate(2deg);
+    }
+  }
+
+  .nav-link:hover {
+    animation: nav-link-bop 0.35s ease;
+  }
+
+  @keyframes nav-link-bop {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+
+  .see-all:hover {
+    animation: see-all-nudge 0.4s ease;
+  }
+
+  @keyframes see-all-nudge {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+  }
+
+  .search:focus-within {
+    animation: search-glow-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes search-glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+    }
+    50% {
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+    }
+  }
+
+  .logo:hover .logo-img {
+    animation: logo-fun-wobble 0.5s ease;
+  }
+
+  @keyframes logo-fun-wobble {
+    0%,
+    100% {
+      transform: scale(1.05) rotate(-2deg);
+    }
+    25% {
+      transform: scale(1.08) rotate(4deg);
+    }
+    75% {
+      transform: scale(1.06) rotate(-5deg);
+    }
+  }
+
+  .section-head h2.is-visible {
+    animation: title-pop 0.5s cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
+
+  @keyframes title-pop {
+    0% {
+      opacity: 0;
+      transform: translateX(-12px);
+    }
+    70% {
+      transform: translateX(4px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .similar-card:hover {
+    animation: similar-card-hop 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  @keyframes similar-card-hop {
+    0% {
+      transform: translateY(0) scale(1);
+    }
+    40% {
+      transform: translateY(-6px) scale(1.05) rotate(2deg);
+    }
+    100% {
+      transform: translateY(-4px) scale(1.03);
+    }
+  }
+
+  .grid-retry-btn:hover {
+    animation: retry-shake 0.4s ease;
+  }
+
+  @keyframes retry-shake {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-4deg);
+    }
+    75% {
+      transform: rotate(4deg);
+    }
+  }
+
+  .game-section--alt {
+    animation: section-alt-glow 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes section-alt-glow {
+    0% {
+      box-shadow: inset 0 0 0 rgba(168, 85, 247, 0);
+    }
+    100% {
+      box-shadow: inset 0 0 30px rgba(124, 58, 237, 0.08);
+    }
+  }
+
+  .menu-toggle:hover {
+    animation: menu-icon-jiggle 0.35s ease;
+  }
+
+  @keyframes menu-icon-jiggle {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    33% {
+      transform: rotate(-6deg);
+    }
+    66% {
+      transform: rotate(6deg);
+    }
+  }
+}
+
+/* Touch: tap pop on heart */
+@media (hover: none) {
+  .game-fav-btn:active {
+    transform: scale(1.25) rotate(-8deg);
+  }
+
+  .game-card:active {
+    transform: scale(0.96);
+  }
+}

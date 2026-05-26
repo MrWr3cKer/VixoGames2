@@ -1,0 +1,109 @@
+/**
+ * Fantasy purple atmosphere + click ripples
+ */
+
+/* Avoid double animated glow from kid-friendly layer */
+.bg-glow--fantasy::after {
+  display: none;
+}
+
+.bg-glow--fantasy {
+  background:
+    radial-gradient(ellipse 70% 45% at 15% 0%, rgba(139, 92, 246, 0.32), transparent 52%),
+    radial-gradient(ellipse 55% 40% at 88% 15%, rgba(192, 132, 252, 0.18), transparent 48%),
+    radial-gradient(ellipse 50% 35% at 50% 100%, rgba(124, 58, 237, 0.14), transparent 42%),
+    radial-gradient(ellipse 90% 60% at 50% 50%, rgba(76, 29, 149, 0.08), transparent 70%);
+}
+
+.bg-glow--fantasy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1px 1px at 78% 18%, rgba(216, 180, 254, 0.9), transparent),
+    radial-gradient(1.5px 1.5px at 44% 68%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 91% 72%, rgba(192, 132, 252, 0.8), transparent),
+    radial-gradient(1px 1px at 28% 88%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 62% 12%, rgba(233, 213, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 8% 55%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 55% 38%, rgba(216, 180, 254, 0.55), transparent);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bg-glow--fantasy::before {
+    animation: fantasy-stars-twinkle 5s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes fantasy-stars-twinkle {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.magic-ripples {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.magic-ripple {
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.25);
+  border: 2px solid rgba(192, 132, 252, 0.55);
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.28) 0%,
+    rgba(124, 58, 237, 0.1) 45%,
+    transparent 70%
+  );
+  box-shadow:
+    0 0 24px rgba(168, 85, 247, 0.35),
+    inset 0 0 20px rgba(255, 255, 255, 0.08);
+  animation: magic-ripple-wave var(--ripple-dur, 0.9s) ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes magic-ripple-wave {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.75;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(var(--ripple-peak, 1.35));
+    opacity: 0.5;
+  }
+  65% {
+    transform: translate(-50%, -50%) scale(calc(var(--ripple-peak, 1.35) * 0.85));
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* Subtle fantasy frame on hero */
+.hero--home {
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  box-shadow:
+    inset 0 0 40px rgba(124, 58, 237, 0.12),
+    0 8px 32px rgba(76, 29, 149, 0.25);
+}
+
+.hero-badge {
+  background: linear-gradient(180deg, rgba(163, 230, 53, 0.28), rgba(124, 58, 237, 0.15));
+  color: #d9f99d;
+}
+

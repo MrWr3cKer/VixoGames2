@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Page not found – VixoGames</title>
+  <link rel="icon" href="logo/logo.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=8" />
+  <link rel="stylesheet" href="css/kid-friendly.css?v=2" />
+  <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
+  <link rel="stylesheet" href="css/kid-animations.css?v=1" />
+</head>
+<body>
+  <div class="bg-glow bg-glow--fantasy" aria-hidden="true"></div>
+  <div class="magic-ripples" id="magic-ripples" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="index.html" class="logo"><img src="logo/logo.png" alt="VixoGames" class="logo-img" width="180" height="52" /></a>
+  </header>
+  <main class="static-page static-page--404">
+    <h1>404</h1>
+    <p class="static-lead">That page doesn’t exist — but these free games do.</p>
+    <p><a href="index.html" class="btn btn-primary">Go to homepage</a></p>
+    <section class="game-section" style="margin-top: 2rem;">
+      <h2>Try one of these</h2>
+      <div class="game-grid game-grid--dense" id="404-games">Loading picks…</div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      const grid = document.getElementById("404-games");
+      if (!grid) return;
+      fetch("https://feeds.gamepix.com/v2/json?sid=1INOM&pagination=12&page=1")
+        .then(function (r) { return r.json(); })
+        .then(function (feed) {
+          const items = (feed.items || []).slice(0, 8);
+          grid.innerHTML = "";
+          items.forEach(function (item) {
+            const q = new URLSearchParams();
+            if (item.namespace) q.set("game", item.namespace);
+            if (item.title) q.set("title", item.title);
+            if (item.category) q.set("category", item.category);
+            const a = document.createElement("a");
+            a.className = "similar-card";
+            a.href = item.namespace
+              ? "games/" + encodeURIComponent(item.namespace)
+              : "index.html";
+            a.innerHTML =
+              '<div class="similar-card-cover"><img src="' +
+              (item.banner_image || item.image || "") +
+              '" alt="" loading="lazy" /></div><div class="similar-card-body"><span class="similar-card-title">' +
+              (item.title || "Game") +
+              "</span></div>";
+            grid.appendChild(a);
+          });
+        })
+        .catch(function () {
+          grid.innerHTML = "<p>Could not load suggestions. <a href=\"index.html\">Browse home</a>.</p>";
+        });
+    })();
+  </script>
+  <script src="js/magic-bg.js?v=2" defer></script>
+</body>
+</html>

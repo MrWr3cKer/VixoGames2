@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    { "source": "/games/:slug", "destination": "/games/index.html" }
+  ],
+  "redirects": [
+    {
+      "source": "/play.html",
+      "has": [{ "type": "query", "key": "game", "value": "(?<slug>.*)" }],
+      "destination": "/games/:slug",
+      "permanent": true
+    }
+  ]
+}

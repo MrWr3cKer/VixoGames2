@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Play a free browser game on VixoGames — no download required." />
+  <link rel="canonical" id="canonical-url" href="" />
+  <title>Play – VixoGames</title>
+  <link rel="icon" href="../logo/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://feeds.gamepix.com" />
+  <link rel="preconnect" href="https://play.gamepix.com" />
+  <link rel="preconnect" href="https://img.gamepix.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css?v=8" />
+  <link rel="stylesheet" href="../css/kid-friendly.css?v=2" />
+  <link rel="stylesheet" href="../css/fantasy-magic.css?v=1" />
+  <link rel="stylesheet" href="../css/kid-animations.css?v=1" />
+</head>
+<body class="play-page">
+  <div class="bg-glow bg-glow--fantasy" aria-hidden="true"></div>
+  <div class="magic-ripples" id="magic-ripples" aria-hidden="true"></div>
+
+  <header class="play-header">
+    <a href="../index.html" class="play-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      Back
+    </a>
+    <div class="play-header-center">
+      <h1 class="play-title" id="play-title">Loading game…</h1>
+      <span class="play-category" id="play-category"></span>
+    </div>
+    <div class="play-header-actions">
+      <button type="button" class="play-action-btn" id="btn-favorite-play" aria-label="Add to favorites" aria-pressed="false" title="Favorite">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </button>
+      <button type="button" class="play-action-btn" id="btn-share" aria-label="Copy link to this game" title="Share">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
+        <span class="play-action-label" id="share-label">Share</span>
+      </button>
+    </div>
+    <a href="../index.html" class="logo logo--compact" aria-label="VixoGames home">
+      <img src="../logo/logo.png" alt="VixoGames" class="logo-img" width="140" height="40" />
+    </a>
+  </header>
+
+  <main class="play-layout">
+    <aside class="play-sidebar" aria-label="More games">
+      <div class="sidebar-head">
+        <h2 class="sidebar-title">You may also like</h2>
+        <span class="sidebar-count" id="similar-count"></span>
+      </div>
+      <div class="similar-list" id="similar-left"></div>
+    </aside>
+
+    <section class="play-center">
+      <p class="play-game-desc is-hidden" id="play-desc"></p>
+      <div class="play-stage-shell">
+        <div class="play-toolbar">
+          <button type="button" class="toolbar-btn toolbar-btn--primary" id="btn-fullscreen" aria-label="Fullscreen" title="Fullscreen">
+            <svg class="icon-fs-enter" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+            <svg class="icon-fs-exit is-hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+            </svg>
+            <span class="toolbar-btn-label">Fullscreen</span>
+          </button>
+        </div>
+
+        <div class="game-stage" id="game-stage">
+          <div class="play-loading-bar" id="play-loading-bar" aria-hidden="true">
+            <div class="play-loading-bar-fill" id="play-loading-fill"></div>
+          </div>
+          <div class="game-stage-inner">
+            <iframe id="game-frame" title="Game player" tabindex="0" allow="fullscreen; gamepad; autoplay" allowfullscreen loading="eager"></iframe>
+          </div>
+          <div class="game-stage-loading" id="play-loading" role="status" aria-live="polite">
+            <div class="play-loading-spinner" aria-hidden="true"></div>
+            <p class="play-loading-text" id="play-loading-text">Loading game…</p>
+            <button type="button" class="btn btn-ghost btn-sm play-loading-retry is-hidden" id="play-retry">Try again</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="play-error is-hidden" id="play-error">
+        Could not load this game. <a href="../index.html">Return to the homepage</a>.
+      </p>
+    </section>
+
+    <aside class="play-sidebar play-sidebar--right" aria-label="Trending games">
+      <div class="sidebar-head">
+        <h2 class="sidebar-title">Trending now</h2>
+      </div>
+      <div class="similar-list" id="similar-right"></div>
+    </aside>
+
+    <section class="play-similar-mobile" aria-label="More games">
+      <div class="sidebar-head">
+        <h2 class="sidebar-title">More games for you</h2>
+      </div>
+      <div class="similar-list similar-list--grid" id="similar-mobile"></div>
+    </section>
+  </main>
+
+  <script src="../js/routes.js?v=3" defer></script>
+  <script src="../js/storage.js?v=3" defer></script>
+  <script src="../js/magic-bg.js?v=2" defer></script>
+  <script src="../js/animations.js?v=2" defer></script>
+  <script src="../js/play.js?v=9" defer></script>
+</body>
+</html>

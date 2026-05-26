@@ -1,0 +1,5 @@
+# When you deploy to Netlify — same /games/slug URLs as locally
+[[redirects]]
+  from = "/games/*"
+  to = "/games/index.html"
+  status = 200
