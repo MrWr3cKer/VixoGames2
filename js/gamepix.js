@@ -823,24 +823,22 @@ function updateGameCardLinksToPretty() {
 }
 
 document.addEventListener("vixo:routes-ready", function (ev) {
-  if (ev && ev.detail && ev.detail.pretty === true) {
-    window.requestAnimationFrame(updateGameCardLinksToPretty);
-  }
+  // With pretty URLs as the default, no need to patch hrefs.
 });
 
 // Personal sections (favorites/recent/play again) may render after our initial probe.
 // Re-run on those events too.
 document.addEventListener("vixo:games-loaded", function () {
-  window.requestAnimationFrame(updateGameCardLinksToPretty);
+  // With pretty URLs as the default, no need to patch hrefs.
 });
 document.addEventListener("vixo:recent-updated", function () {
-  window.requestAnimationFrame(updateGameCardLinksToPretty);
+  // With pretty URLs as the default, no need to patch hrefs.
 });
 document.addEventListener("vixo:favorites-updated", function () {
-  window.requestAnimationFrame(updateGameCardLinksToPretty);
+  // With pretty URLs as the default, no need to patch hrefs.
 });
 document.addEventListener("vixo:category-mounted", function () {
-  window.requestAnimationFrame(updateGameCardLinksToPretty);
+  // With pretty URLs as the default, no need to patch hrefs.
 });
 
 document.addEventListener("DOMContentLoaded", function () {

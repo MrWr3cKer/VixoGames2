@@ -1,6 +1,6 @@
 /**
- * Game play URLs — always use games/index.html?game=slug locally (works everywhere).
- * Pretty /games/slug when server supports it (server.py, Netlify, Vercel).
+ * Game play URLs — always use pretty `/games/<slug>` URLs.
+ * Server/deploy rewrites route these to `games/index.html`.
  */
 (function () {
   let prettyDetectPromise = null;
@@ -33,12 +33,9 @@
     if (!slug) {
       return getSiteBase() + "index.html";
     }
-    // When the server supports rewrites (/games/<slug>), use the pretty URL.
-    // Otherwise fall back to query-string URLs (works everywhere).
-    if (window.vixoUsePrettyPaths === true) {
-      return getSiteBase() + "games/" + encodeURIComponent(slug);
-    }
-    return getGamePlayPathQuery(slug);
+    // Always prefer pretty URL: /games/<slug>.
+    // Your server/deploy config rewrites this to games/index.html (SPA-style).
+    return getSiteBase() + "games/" + encodeURIComponent(slug);
   }
 
   function detectPrettyPaths() {
@@ -123,7 +120,6 @@
 
   function replaceUrlWithGamePath(slug) {
     if (!slug || !window.history.replaceState) return;
-    if (window.vixoUsePrettyPaths !== true) return;
 
     const base = getSiteBase();
     const next = base + "games/" + encodeURIComponent(slug);
