@@ -1,4 +1,4 @@
-const GAMEPIX_SID = "1INOM";
+const GAMEPIX_SID = "1VXSV";
 const GAMEPIX_PAGE_SIZE = 24;
 const GAMEPIX_FEED_BASE = "https://feeds.gamepix.com/v2/json";
 function formatCategory(slug) {
@@ -196,6 +196,9 @@ function createSimilarCard(item) {
   const link = document.createElement("a");
   link.className = "similar-card";
   link.href = getPlayPageUrl(item);
+  if (item.namespace) {
+    link.dataset.namespace = item.namespace;
+  }
   link.title = item.title || "Game";
 
   const cover = document.createElement("div");
@@ -225,12 +228,32 @@ function createSimilarCard(item) {
   return link;
 }
 
+function updateSimilarLinksToPretty() {
+  if (!window.vixoRoutes || window.vixoUsePrettyPaths !== true) return;
+  const links = document.querySelectorAll(".similar-card[data-namespace]");
+  links.forEach(function (link) {
+    const slug = link.dataset.namespace;
+    if (!slug) return;
+    link.href = window.vixoRoutes.getGamePlayPath({ namespace: slug });
+  });
+}
+
+document.addEventListener("vixo:routes-ready", function (ev) {
+  if (ev && ev.detail && ev.detail.pretty === true) {
+    updateSimilarLinksToPretty();
+  }
+});
+
 function renderSimilarList(container, items) {
   if (!container) return;
   container.innerHTML = "";
   items.forEach(function (item) {
     container.appendChild(createSimilarCard(item));
   });
+  // If pretty paths are already enabled, ensure sidebar links are clean.
+  if (window.vixoUsePrettyPaths === true) {
+    updateSimilarLinksToPretty();
+  }
 }
 
 async function buildSimilarPool(category) {

@@ -2,7 +2,7 @@
  * GamePix JSON feed → VixoGames homepage
  */
 
-const GAMEPIX_SID = "1INOM";
+const GAMEPIX_SID = "1VXSV";
 const GAMEPIX_PAGE_SIZE = 48;
 const GAMEPIX_PAGE_SIZE_FALLBACK = 24;
 const GAMEPIX_FEED_BASE = "https://feeds.gamepix.com/v2/json";
@@ -237,6 +237,9 @@ function createGameCard(item, options = {}) {
   cardLink.href = playUrl;
   cardLink.className = "game-card-link";
   cardLink.setAttribute("aria-label", `Play ${item.title}`);
+  if (item.namespace) {
+    cardLink.dataset.namespace = item.namespace;
+  }
 
   const img = document.createElement("img");
   img.className = "game-thumb-img";
@@ -804,6 +807,41 @@ window.vixoSearchHelpers = {
 window.createGameCard = createGameCard;
 window.renderGameCards = renderGameCards;
 window.setSectionCount = setSectionCount;
+
+function updateGameCardLinksToPretty() {
+  if (!window.vixoRoutes || window.vixoUsePrettyPaths !== true) return;
+  const cards = document.querySelectorAll(".game-card[data-namespace]");
+  cards.forEach(function (card) {
+    const slug = card.dataset.namespace;
+    if (!slug) return;
+    const href = window.vixoRoutes.getGamePlayPath({ namespace: slug });
+    // Update both the image overlay link and the title link.
+    card.querySelectorAll("a.game-card-link, h3 a").forEach(function (a) {
+      a.href = href;
+    });
+  });
+}
+
+document.addEventListener("vixo:routes-ready", function (ev) {
+  if (ev && ev.detail && ev.detail.pretty === true) {
+    window.requestAnimationFrame(updateGameCardLinksToPretty);
+  }
+});
+
+// Personal sections (favorites/recent/play again) may render after our initial probe.
+// Re-run on those events too.
+document.addEventListener("vixo:games-loaded", function () {
+  window.requestAnimationFrame(updateGameCardLinksToPretty);
+});
+document.addEventListener("vixo:recent-updated", function () {
+  window.requestAnimationFrame(updateGameCardLinksToPretty);
+});
+document.addEventListener("vixo:favorites-updated", function () {
+  window.requestAnimationFrame(updateGameCardLinksToPretty);
+});
+document.addEventListener("vixo:category-mounted", function () {
+  window.requestAnimationFrame(updateGameCardLinksToPretty);
+});
 
 document.addEventListener("DOMContentLoaded", function () {
   loadGamePixHomepage();

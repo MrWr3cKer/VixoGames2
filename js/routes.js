@@ -33,6 +33,11 @@
     if (!slug) {
       return getSiteBase() + "index.html";
     }
+    // When the server supports rewrites (/games/<slug>), use the pretty URL.
+    // Otherwise fall back to query-string URLs (works everywhere).
+    if (window.vixoUsePrettyPaths === true) {
+      return getSiteBase() + "games/" + encodeURIComponent(slug);
+    }
     return getGamePlayPathQuery(slug);
   }
 

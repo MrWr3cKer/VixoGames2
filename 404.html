@@ -31,7 +31,7 @@
     (function () {
       const grid = document.getElementById("404-games");
       if (!grid) return;
-      fetch("https://feeds.gamepix.com/v2/json?sid=1INOM&pagination=12&page=1")
+      fetch("https://feeds.gamepix.com/v2/json?sid=1VXSV&pagination=12&page=1")
         .then(function (r) { return r.json(); })
         .then(function (feed) {
           const items = (feed.items || []).slice(0, 8);

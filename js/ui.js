@@ -40,6 +40,25 @@ document.addEventListener("DOMContentLoaded", function () {
     initNavScrollSpy();
     refreshSearchIndex();
   });
+
+// If pretty paths become available after our initial link rendering,
+// rebuild the search index so the dropdown opens clean `/games/<slug>` URLs.
+document.addEventListener("vixo:routes-ready", function (ev) {
+  if (!ev || !ev.detail || ev.detail.pretty !== true) return;
+  // Wait a tick so gamepix/home can update hrefs to pretty URLs.
+  window.requestAnimationFrame(function () {
+    if (typeof refreshSearchIndex === "function") refreshSearchIndex();
+  });
+});
+
+// Personal sections (favorites/recent/play again) can change after load.
+["vixo:recent-updated", "vixo:favorites-updated", "vixo:category-mounted"].forEach(function (evt) {
+  document.addEventListener(evt, function () {
+    window.requestAnimationFrame(function () {
+      if (typeof refreshSearchIndex === "function") refreshSearchIndex();
+    });
+  });
+});
 });
 
 const SEARCH_DROPDOWN_LIMIT = 8;
