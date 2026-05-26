@@ -66,12 +66,38 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+function markCardPopDone(card) {
+  card.classList.remove("card-pop-in");
+  card.classList.add("card-pop-done");
+}
+
+function wireCardPopAnimation(card, index) {
+  if (card.classList.contains("card-pop-done") || card.classList.contains("card-pop-in")) {
+    return;
+  }
+
+  var delaySec = Math.min(index * 0.04, 1.2);
+  card.classList.add("card-pop-in");
+  card.style.setProperty("--pop-delay", delaySec + "s");
+
+  function onEnd(e) {
+    if (e.animationName !== "card-pop-in") return;
+    markCardPopDone(card);
+    card.removeEventListener("animationend", onEnd);
+  }
+
+  card.addEventListener("animationend", onEnd);
+  window.setTimeout(function () {
+    if (!card.classList.contains("card-pop-done")) {
+      markCardPopDone(card);
+    }
+  }, delaySec * 1000 + 650);
+}
+
 function staggerGameCards(section) {
   var cards = section.querySelectorAll(".game-card");
   cards.forEach(function (card, i) {
-    if (card.classList.contains("card-pop-in")) return;
-    card.classList.add("card-pop-in");
-    card.style.setProperty("--pop-delay", Math.min(i * 0.04, 1.2) + "s");
+    wireCardPopAnimation(card, i);
   });
 }
 

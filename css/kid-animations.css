@@ -112,6 +112,12 @@
     animation-delay: var(--pop-delay, 0s);
   }
 
+  .game-card.card-pop-done {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
   @keyframes card-pop-in {
     0% {
       opacity: 0;
@@ -126,22 +132,10 @@
     }
   }
 
-  .game-card:hover {
+  /* Hover lift only after pop-in — never override animation (causes fade-out on mouse leave) */
+  .game-card.card-pop-done:hover {
     transform: translateY(-6px) rotate(-1deg);
-    animation: card-wiggle-hover 0.5s ease;
-  }
-
-  @keyframes card-wiggle-hover {
-    0%,
-    100% {
-      transform: translateY(-6px) rotate(-1deg);
-    }
-    25% {
-      transform: translateY(-7px) rotate(1deg);
-    }
-    75% {
-      transform: translateY(-5px) rotate(-2deg);
-    }
+    z-index: 2;
   }
 
   .game-card-link::before {

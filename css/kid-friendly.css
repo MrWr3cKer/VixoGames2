@@ -263,12 +263,12 @@ main,
     transform: translateY(-2px);
   }
 
-  /* Game cards — gentle lift */
-  .game-card {
+  /* Game cards — gentle lift (only after entrance animation finishes) */
+  .game-card.card-pop-done {
     transition: transform 0.25s ease;
   }
 
-  .game-card:hover {
+  .game-card.card-pop-done:hover {
     transform: translateY(-4px);
     z-index: 2;
   }
