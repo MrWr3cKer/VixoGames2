@@ -5,8 +5,8 @@
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.vixogames.com" }],
-      "destination": "https://vixogames.com/:path*",
+      "has": [{ "type": "host", "value": "vixogames.com" }],
+      "destination": "https://www.vixogames.com/:path*",
       "permanent": true
     },
     {
