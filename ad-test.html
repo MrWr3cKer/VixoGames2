@@ -4,26 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Adsterra test – VixoGames</title>
+  <link rel="stylesheet" href="css/ads.css?v=6" />
   <style>
-    body { margin: 0; font-family: system-ui, sans-serif; background: #0c0a14; color: #f4f0ff; padding: 2rem; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0c0a14;
+      color: #f4f0ff;
+      padding: 2rem 2rem 2rem 12rem;
+    }
     p { max-width: 520px; line-height: 1.6; }
   </style>
 </head>
-<body>
-  <script>
-    atOptions = {
-      'key' : 'c7f791b56299129e9f1ed08bf70c3a5e',
-      'format' : 'iframe',
-      'height' : 600,
-      'width' : 160,
-      'params' : {}
-    };
-  </script>
-  <script src="https://www.highperformanceformat.com/c7f791b56299129e9f1ed08bf70c3a5e/invoke.js"></script>
+<body class="has-ad-rail">
+  <aside class="ad-rail" aria-label="Advertisement">
+    <div class="ad-rail__slot" id="adsterra-slot">
+      <div class="ad-rail__placeholder" aria-hidden="true">
+        <span class="ad-rail__placeholder-label">Ad space · loading…</span>
+      </div>
+      <script>
+        atOptions = {
+          'key' : 'c7f791b56299129e9f1ed08bf70c3a5e',
+          'format' : 'iframe',
+          'height' : 600,
+          'width' : 160,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/c7f791b56299129e9f1ed08bf70c3a5e/invoke.js"></script>
+    </div>
+  </aside>
 
   <h1>Adsterra test page</h1>
-  <p>This page contains <strong>only</strong> your exact Adsterra code — no custom side panel.</p>
-  <p>If no banner appears: turn off ad blocker, try <strong>vixogames.com</strong> (without www), and check that domain is approved in Adsterra.</p>
+  <p>Exact Adsterra code inside the left holder (160×600). Placeholder shows until the iframe loads.</p>
+  <p>Turn off ad blocker. Use <strong>vixogames.com</strong>. New zones can take 5–30 minutes to fill.</p>
   <p><a href="index.html" style="color:#a855f7">← Back to homepage</a></p>
+
+  <script src="js/ad-rail.js?v=1"></script>
 </body>
 </html>

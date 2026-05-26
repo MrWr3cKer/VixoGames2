@@ -1,4 +1,4 @@
-const CACHE_NAME = "vixo-shell-v6";
+const CACHE_NAME = "vixo-shell-v7";
 const SHELL = [
   "index.html",
   "games/index.html",
@@ -19,6 +19,7 @@ const SHELL = [
   "js/ui.js",
   "js/gamepix.js",
   "js/home.js",
+  "js/ad-rail.js",
   "js/play.js",
   "logo/logo.png",
 ];
