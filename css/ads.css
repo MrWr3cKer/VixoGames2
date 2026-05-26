@@ -43,21 +43,34 @@
     min-height: 600px;
     flex-shrink: 0;
     border-radius: 12px;
-    overflow: hidden;
-    background: rgba(22, 18, 42, 0.5);
+    overflow: visible;
+    background: rgba(22, 18, 42, 0.35);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
   }
 
+  /* Adsterra injects iframe after the invoke script (inside or after slot) */
+  .ad-rail iframe,
+  .ad-rail__slot iframe,
+  .ad-rail__slot > div,
+  .ad-rail__slot > a,
+  .ad-rail > iframe,
+  .ad-rail > div:not(.ad-rail__slot) {
+    display: block !important;
+    width: 160px !important;
+    max-width: 160px !important;
+    min-height: 600px;
+    margin: 0 auto;
+  }
+
   .ad-rail__slot iframe {
-    display: block;
-    max-width: 100%;
+    border: 0;
+    border-radius: 10px;
   }
 }
 
 @media (min-width: 1280px) and (max-height: 700px) {
   .ad-rail {
-    align-items: flex-start;
     padding-top: 0.35rem;
   }
 
