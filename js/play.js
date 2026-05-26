@@ -410,6 +410,7 @@ var SMARTLINK_URL =
   "https://data527.click/6e6df467db5c83467f9c/9cc0e62529/?placementName=default";
 var SMARTLINK_STORAGE_KEY = "vixo-smartlink-at";
 var SMARTLINK_COOLDOWN_MS = 4 * 60 * 60 * 1000;
+var smartlinkMemoryLock = false;
 
 function isMobileOrTabletUser() {
   var ua = navigator.userAgent || "";
@@ -432,6 +433,8 @@ function isMobileOrTabletUser() {
 }
 
 function canOpenSmartlink() {
+  if (smartlinkMemoryLock) return false;
+
   try {
     var last = parseInt(localStorage.getItem(SMARTLINK_STORAGE_KEY), 10);
     if (last && !isNaN(last) && Date.now() - last < SMARTLINK_COOLDOWN_MS) {
@@ -439,23 +442,25 @@ function canOpenSmartlink() {
     }
     return true;
   } catch (e) {
-    return false;
+    return !smartlinkMemoryLock;
   }
 }
 
 function markSmartlinkOpened() {
+  smartlinkMemoryLock = true;
   try {
     localStorage.setItem(SMARTLINK_STORAGE_KEY, String(Date.now()));
-  } catch (e) {}
+  } catch (e) {
+    /* private mode — memory lock still applies this session */
+  }
 }
 
 function maybeOpenSmartlinkOnFullscreen() {
   if (!isMobileOrTabletUser() || !canOpenSmartlink()) return;
 
-  var opened = window.open(SMARTLINK_URL, "_blank", "noopener,noreferrer");
-  if (opened) {
-    markSmartlinkOpened();
-  }
+  /* Mark before open — mobile browsers often return null from window.open anyway */
+  markSmartlinkOpened();
+  window.open(SMARTLINK_URL, "_blank", "noopener,noreferrer");
 }
 
 function initFullscreen() {
