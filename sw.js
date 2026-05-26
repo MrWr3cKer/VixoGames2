@@ -6,6 +6,7 @@ const SHELL = [
   "about.html",
   "privacy.html",
   "404.html",
+  "ad-test.html",
   "css/styles.css",
   "css/kid-friendly.css",
   "css/fantasy-magic.css",
