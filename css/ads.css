@@ -1,58 +1,40 @@
 /**
- * Fixed left Adsterra skyscraper — vertically centered, desktop only
+ * Direct Adsterra placement — fixed, vertically centered on the left (desktop)
  */
 
-:root {
-  --ad-rail-w: 176px;
+.ad-direct {
+  position: fixed;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  width: 160px;
+  line-height: 0;
 }
 
-.ad-rail {
-  display: none;
+.ad-direct iframe {
+  display: block;
+  width: 160px;
+  height: 600px;
+  max-height: calc(100vh - 2rem);
+  border: 0;
+}
+
+@media (max-width: 1279px) {
+  .ad-direct {
+    display: none !important;
+  }
 }
 
 @media (min-width: 1280px) {
-  body.has-ad-rail {
-    padding-left: var(--ad-rail-w);
-  }
-
-  .ad-rail {
-    display: flex;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: var(--ad-rail-w);
-    height: 100vh;
-    height: 100dvh;
-    z-index: 95;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0.5rem;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      rgba(12, 10, 20, 0.88) 0%,
-      rgba(12, 10, 20, 0.55) 75%,
-      transparent 100%
-    );
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
-  }
-
-  .ad-rail__frame {
-    pointer-events: auto;
-    display: block;
-    width: 160px;
-    height: 600px;
-    max-height: calc(100dvh - 2rem);
-    border: 0;
-    border-radius: 12px;
-    background: transparent;
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+  body {
+    padding-left: 172px;
   }
 }
 
 @media (min-width: 1280px) and (max-height: 680px) {
-  .ad-rail__frame {
-    transform: scale(0.88);
+  .ad-direct {
+    transform: translateY(-50%) scale(0.9);
     transform-origin: center center;
   }
 }
