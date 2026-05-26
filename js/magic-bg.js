@@ -13,7 +13,7 @@
     "a,button,input,select,textarea,label,iframe," +
     ".game-card-link,.game-card,.search-wrap,.search-dropdown," +
     ".menu-toggle,.site-header,.play-header,.play-toolbar," +
-    ".game-stage,.similar-card,.nav-link,.cat-chip,.game-fav-btn,.library-control";
+    ".game-stage,.similar-card,.nav-link,.cat-chip,.game-fav-btn,.library-control,.ad-rail";
 
   document.addEventListener("click", function (e) {
     if (e.target.closest(skipClick)) return;
