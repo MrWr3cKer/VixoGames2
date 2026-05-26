@@ -195,3 +195,28 @@
     display: none !important;
   }
 }
+
+/* Play page: ad rails already use side space — hide in-page sidebars so the game stays large */
+@media (min-width: 1024px) {
+  body.play-page.has-ad-rail .play-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: none;
+  }
+
+  body.play-page.has-ad-rail .play-sidebar,
+  body.play-page.has-ad-rail .play-sidebar--right {
+    display: none !important;
+  }
+
+  body.play-page.has-ad-rail .play-center {
+    width: 100%;
+  }
+
+  body.play-page.has-ad-rail .play-stage-shell {
+    width: 100%;
+    max-width: min(100%, var(--game-max-width, 1040px));
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
