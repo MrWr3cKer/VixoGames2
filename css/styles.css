@@ -1701,14 +1701,14 @@ main,
 }
 
 @media (max-width: 1200px) {
-  .play-layout {
+  .play-page:not(.has-ad-rail) .play-layout {
     grid-template-columns: minmax(180px, 200px) minmax(0, 1fr) minmax(180px, 200px);
     gap: 1rem;
     padding: 1rem;
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
   .play-layout {
     grid-template-columns: 1fr;
     max-width: 960px;
@@ -1724,6 +1724,69 @@ main,
 
   .play-stage-shell {
     max-width: 100%;
+  }
+}
+
+/* Desktop play: large game on top, recommendations below (scroll down) */
+@media (min-width: 1024px) {
+  .play-page .play-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+    max-width: none;
+    width: 100%;
+    padding: 1.25rem 0.75rem 3rem;
+    box-sizing: border-box;
+  }
+
+  .play-page .play-center {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    order: 1;
+  }
+
+  .play-page .play-stage-shell {
+    width: 100%;
+    max-width: min(100%, var(--game-max-width, 1040px));
+    margin: 0 auto;
+  }
+
+  .play-page .play-layout:has(.game-stage--portrait) .play-stage-shell {
+    max-width: min(100%, 420px);
+  }
+
+  .play-page .play-sidebar,
+  .play-page .play-sidebar--right {
+    display: block;
+    position: static;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .play-page .play-sidebar {
+    order: 2;
+  }
+
+  .play-page .play-sidebar--right {
+    order: 3;
+  }
+
+  .play-page .play-sidebar .similar-list,
+  .play-page .play-sidebar--right .similar-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .play-page .play-similar-mobile {
+    display: none;
   }
 }
 
