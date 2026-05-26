@@ -886,7 +886,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
     } else {
-      navigator.serviceWorker.register("sw.js").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=17").then(function (reg) {
+        reg.update();
+      }).catch(function () {});
     }
   }
 });
