@@ -4,6 +4,12 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.vixogames.com" }],
+      "destination": "https://vixogames.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/play.html",
       "has": [{ "type": "query", "key": "game", "value": "(?<slug>.*)" }],
       "destination": "/games/:slug",
