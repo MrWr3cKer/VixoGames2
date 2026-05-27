@@ -406,63 +406,6 @@ function initGameFocus() {
   });
 }
 
-var SMARTLINK_URL =
-  "https://data527.click/6e6df467db5c83467f9c/9cc0e62529/?placementName=default";
-var SMARTLINK_STORAGE_KEY = "vixo-smartlink-at";
-var SMARTLINK_COOLDOWN_MS = 4 * 60 * 60 * 1000;
-var smartlinkMemoryLock = false;
-
-function isMobileOrTabletUser() {
-  var ua = navigator.userAgent || "";
-
-  if (/iPad/.test(ua)) return true;
-  if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
-  if (/iPhone|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
-    return true;
-  }
-
-  var desktopLike = window.matchMedia(
-    "(min-width: 1024px) and (hover: hover) and (pointer: fine)"
-  ).matches;
-  if (desktopLike) return false;
-
-  return (
-    window.matchMedia("(max-width: 1023px)").matches &&
-    (window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0)
-  );
-}
-
-function canOpenSmartlink() {
-  if (smartlinkMemoryLock) return false;
-
-  try {
-    var last = parseInt(localStorage.getItem(SMARTLINK_STORAGE_KEY), 10);
-    if (last && !isNaN(last) && Date.now() - last < SMARTLINK_COOLDOWN_MS) {
-      return false;
-    }
-    return true;
-  } catch (e) {
-    return !smartlinkMemoryLock;
-  }
-}
-
-function markSmartlinkOpened() {
-  smartlinkMemoryLock = true;
-  try {
-    localStorage.setItem(SMARTLINK_STORAGE_KEY, String(Date.now()));
-  } catch (e) {
-    /* private mode — memory lock still applies this session */
-  }
-}
-
-function maybeOpenSmartlinkOnFullscreen() {
-  if (!isMobileOrTabletUser() || !canOpenSmartlink()) return;
-
-  /* Mark before open — mobile browsers often return null from window.open anyway */
-  markSmartlinkOpened();
-  window.open(SMARTLINK_URL, "_blank", "noopener,noreferrer");
-}
-
 function initFullscreen() {
   const btn = document.getElementById("btn-fullscreen");
   const stage = document.getElementById("game-stage");
@@ -485,7 +428,6 @@ function initFullscreen() {
     if (document.fullscreenElement === stage) {
       document.exitFullscreen();
     } else {
-      maybeOpenSmartlinkOnFullscreen();
       stage.requestFullscreen().catch(function () {
         stage.classList.toggle("is-fullscreen-fallback");
       });
