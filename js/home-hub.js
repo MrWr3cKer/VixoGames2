@@ -4,9 +4,24 @@
 document.addEventListener("DOMContentLoaded", function () {
   if (!document.body.classList.contains("home-crazy")) return;
 
+  populateHubCategories();
   initHubSidebar();
   initGameRowScrollers();
 });
+
+function populateHubCategories() {
+  var nav = document.getElementById("hub-cat-nav");
+  var list = window.VIXO_CATEGORIES;
+  if (!nav || !list || !list.length) return;
+
+  nav.innerHTML = "";
+  list.forEach(function (cat) {
+    var a = document.createElement("a");
+    a.href = "#cat-" + cat.slug;
+    a.textContent = cat.title;
+    nav.appendChild(a);
+  });
+}
 
 document.addEventListener("vixo:games-loaded", function () {
   if (document.body.classList.contains("home-crazy")) {

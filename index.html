@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="css/kid-animations.css?v=2" />
   <link rel="stylesheet" href="css/ads.css?v=24" />
   <link rel="stylesheet" href="css/home-pro.css?v=2" />
-  <link rel="stylesheet" href="css/crazy-hub.css?v=2" />
+  <link rel="stylesheet" href="css/crazy-hub.css?v=3" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
 <body class="has-ad-rail home-crazy">
@@ -102,15 +102,10 @@
         <a href="#new" class="nav-link">New</a>
         <a href="#library" class="nav-link">All games</a>
       </nav>
-      <p class="hub-sidebar-label">Categories</p>
-      <nav class="hub-cat-nav" aria-label="Categories">
-        <a href="#cat-multiplayer">Multiplayer</a>
-        <a href="#cat-battle">Action</a>
-        <a href="#cat-match-3">Puzzle</a>
-        <a href="#cat-arcade">Arcade</a>
-        <a href="#cat-racing">Racing</a>
-        <a href="#cat-sports">Sports</a>
-      </nav>
+      <div class="hub-sidebar-cats">
+        <p class="hub-sidebar-label">Categories</p>
+        <nav class="hub-cat-nav" id="hub-cat-nav" aria-label="Categories"></nav>
+      </div>
     </aside>
 
     <div class="hub-main">
@@ -339,14 +334,15 @@
   </div>
 
   <!-- deploy: 2026-05-26 -->
+  <script src="js/categories.js?v=1" defer></script>
   <script src="js/routes.js?v=4" defer></script>
   <script src="js/storage.js?v=3" defer></script>
   <script src="js/ui.js?v=9" defer></script>
-  <script src="js/gamepix.js?v=14" defer></script>
+  <script src="js/gamepix.js?v=15" defer></script>
   <script src="js/ad-slot.js?v=11" defer></script>
   <script src="js/magic-bg.js?v=2" defer></script>
   <script src="js/animations.js?v=4" defer></script>
   <script src="js/home.js?v=2" defer></script>
-  <script src="js/home-hub.js?v=1" defer></script>
+  <script src="js/home-hub.js?v=2" defer></script>
 </body>
 </html>

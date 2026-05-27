@@ -25,15 +25,13 @@ const INITIAL_ALL_SHOW = 32;
 
 const categorySectionState = new Map();
 
-/** Featured category rows on homepage (keeps layout clean) */
-const HOME_CATEGORIES = [
-  { slug: "multiplayer", title: "Multiplayer", icon: "", desc: "Play online with friends" },
-  { slug: "battle", title: "Action", icon: "", desc: "Combat, adventure and battles" },
-  { slug: "match-3", title: "Puzzle", icon: "", desc: "Match, think and solve" },
-  { slug: "arcade", title: "Arcade", icon: "", desc: "Quick classics and high scores" },
-  { slug: "racing", title: "Racing", icon: "", desc: "Cars, speed and driving" },
-  { slug: "sports", title: "Sports", icon: "", desc: "Football, basketball and more" },
-];
+/** Homepage category rows (same list as sidebar; lazy-loaded as you scroll) */
+const HOME_CATEGORIES =
+  (typeof window !== "undefined" && window.VIXO_CATEGORIES) || [
+    { slug: "multiplayer", title: "Multiplayer", desc: "Play online with friends" },
+    { slug: "battle", title: "Action", desc: "Combat, adventure and battles" },
+    { slug: "arcade", title: "Arcade", desc: "Quick classics and high scores" },
+  ];
 
 let allGamesPage = INITIAL_MAIN_PAGES + 1;
 let allGamesLoading = false;

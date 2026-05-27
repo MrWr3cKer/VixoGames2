@@ -76,12 +76,52 @@
   top: var(--header-h);
   align-self: flex-start;
   max-height: calc(100dvh - var(--header-h));
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 1rem 0.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
   background: rgba(10, 8, 18, 0.72);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hub-sidebar-nav.main-nav {
+  flex-shrink: 0;
+  padding: 1rem 0.75rem 0.75rem;
+  margin-bottom: 0;
+}
+
+.hub-sidebar-cats {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hub-sidebar-cats .hub-sidebar-label {
+  flex-shrink: 0;
+  padding-top: 0.75rem;
+}
+
+.hub-cat-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0.5rem 1.25rem 0.75rem;
+  margin-bottom: 0;
   scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.5) transparent;
+}
+
+.hub-cat-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hub-cat-nav::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.45);
+  border-radius: 999px;
 }
 
 .hub-main {
@@ -100,8 +140,6 @@
   align-items: stretch;
   justify-content: flex-start;
   gap: 0.15rem;
-  padding: 0;
-  margin-bottom: 1.25rem;
 }
 
 .hub-sidebar-nav .nav-indicator {
@@ -138,13 +176,6 @@
   color: var(--text-muted);
   padding: 0.5rem 0.75rem 0.35rem;
   margin: 0;
-}
-
-.hub-cat-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  margin-bottom: 1rem;
 }
 
 .hub-cat-nav a {
@@ -288,6 +319,11 @@
 .game-row-wrap {
   position: relative;
   margin: 0 -0.25rem;
+  --hub-thumb-h: var(--hub-row-card);
+}
+
+.game-row-wrap:has(.game-card--featured) {
+  --hub-thumb-h: calc(min(320px, 42vw) * 10 / 16);
 }
 
 .game-row-wrap .game-grid--row {
@@ -297,7 +333,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 0.25rem 2.5rem 0.75rem 0.25rem;
+  padding: 0.25rem 0.5rem 0.75rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -340,11 +376,11 @@
 
 .game-row-scroll {
   position: absolute;
-  top: 50%;
-  transform: translateY(-65%);
+  top: calc(0.25rem + var(--hub-thumb-h) / 2);
+  transform: translateY(-50%);
   z-index: 5;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(12, 10, 20, 0.92);
@@ -353,7 +389,7 @@
   display: grid;
   place-items: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .game-row-scroll:hover {
@@ -362,11 +398,11 @@
 }
 
 .game-row-scroll--prev {
-  left: 0;
+  left: 0.35rem;
 }
 
 .game-row-scroll--next {
-  right: 0;
+  right: 0.35rem;
 }
 
 /* Badges */
@@ -419,6 +455,8 @@
     top: var(--header-h);
     bottom: 0;
     z-index: 95;
+    max-height: none;
+    height: calc(100dvh - var(--header-h));
     transform: translateX(-105%);
     transition: transform 0.3s var(--ease);
     box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
