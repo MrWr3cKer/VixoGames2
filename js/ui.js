@@ -1,3 +1,17 @@
+function scrollToSection(target) {
+  if (!target) return;
+  const el =
+    typeof target === "string"
+      ? document.getElementById(target.replace(/^#/, ""))
+      : target;
+  if (!el) return;
+  if (typeof window.vixoScrollToSection === "function") {
+    window.vixoScrollToSection(el);
+    return;
+  }
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   initMainNav();
 
@@ -27,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const slug = chip.dataset.filter;
       if (slug && slug !== "all" && slug !== "trending") {
         const target = document.getElementById("cat-" + slug);
-        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (target) scrollToSection(target);
       }
     });
   });
@@ -302,9 +316,7 @@ function initSearchDropdown() {
     moreBtn.addEventListener("click", function () {
       setDropdownOpen(false);
       const all = document.getElementById("library");
-      if (all) {
-        all.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      if (all) scrollToSection(all);
     });
   }
 
@@ -594,7 +606,7 @@ function filterGamesByChip(filter) {
         !card.closest(".is-section-hidden");
       card.style.display = inVisibleSection ? "" : "none";
     });
-    document.getElementById("trending")?.scrollIntoView({ behavior: "smooth" });
+    scrollToSection(document.getElementById("trending"));
     return;
   }
 
@@ -610,7 +622,7 @@ function filterGamesByChip(filter) {
   const catSection = document.getElementById("cat-" + filter);
   if (catSection) {
     catSection.classList.remove("is-section-hidden");
-    catSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToSection(catSection);
   }
 
   cards.forEach(function (card) {

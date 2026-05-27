@@ -14,8 +14,8 @@ const INITIAL_MAIN_PAGES = 3;
 const QUICK_LOAD_PAGES = 2;
 /** Per category row on homepage — page 2 only when page 1 is full */
 const CATEGORY_PAGES_EACH = 1;
-const CATEGORY_LAZY_MARGIN = "480px 0px";
-const MAX_CATEGORY_FETCHES = 2;
+/** Max parallel category fetches (all queued at once, drained in batches) */
+const MAX_CATEGORY_FETCHES = 4;
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
 const TRENDING_SHOW = 16;
@@ -26,7 +26,7 @@ const INITIAL_ALL_SHOW = 32;
 
 const categorySectionState = new Map();
 
-/** Homepage category rows (same list as sidebar; lazy-loaded as you scroll) */
+/** Homepage category rows (same list as sidebar) */
 const HOME_CATEGORIES =
   (typeof window !== "undefined" && window.VIXO_CATEGORIES) || [
     { slug: "multiplayer", title: "Multiplayer", desc: "Play online with friends" },
@@ -137,7 +137,6 @@ async function fetchGamePixPageRange(startPage, pageCount, category = null) {
   return dedupeGames(merged);
 }
 
-let categoryLazyObserver = null;
 let categoryFetchActive = 0;
 const categoryFetchQueue = [];
 const categoryLoadedSlugs = new Set();
@@ -211,34 +210,16 @@ function queueCategoryFetch(placeholder, slug) {
   drainCategoryQueue();
 }
 
-function initLazyCategoryRows() {
+function initCategoryRows() {
   const categoryRoot = document.getElementById("category-sections");
-  if (!categoryRoot || categoryRoot.dataset.lazyInit === "1") return;
-  categoryRoot.dataset.lazyInit = "1";
+  if (!categoryRoot || categoryRoot.dataset.categoriesInit === "1") return;
+  categoryRoot.dataset.categoriesInit = "1";
   categoryRoot.innerHTML = "";
 
   HOME_CATEGORIES.forEach(function (cat) {
-    categoryRoot.appendChild(createCategoryPlaceholder(cat));
-  });
-
-  if (categoryLazyObserver) categoryLazyObserver.disconnect();
-
-  categoryLazyObserver = new IntersectionObserver(
-    function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        const placeholder = entry.target;
-        const slug = placeholder.dataset.lazyCategory;
-        if (!slug) return;
-        queueCategoryFetch(placeholder, slug);
-        categoryLazyObserver.unobserve(placeholder);
-      });
-    },
-    { rootMargin: CATEGORY_LAZY_MARGIN, threshold: 0.01 }
-  );
-
-  categoryRoot.querySelectorAll("[data-lazy-category]").forEach(function (el) {
-    categoryLazyObserver.observe(el);
+    const placeholder = createCategoryPlaceholder(cat);
+    categoryRoot.appendChild(placeholder);
+    queueCategoryFetch(placeholder, cat.slug);
   });
 }
 
@@ -656,6 +637,10 @@ function createCategorySection(config, items) {
   return section;
 }
 
+let heroRotationItems = [];
+let heroRotationIndex = 0;
+let heroRotationTimer = null;
+
 function updateHeroFromGame(item) {
   const titleEl = document.getElementById("hero-title");
   const descEl = document.getElementById("hero-desc");
@@ -663,6 +648,7 @@ function updateHeroFromGame(item) {
   const heroLink = document.getElementById("hero-card-link");
   const thumbEl = document.getElementById("hero-thumb");
   const badge = document.getElementById("hero-badge");
+  const card = document.querySelector(".hub-welcome__card");
 
   if (!item) return;
 
@@ -689,6 +675,32 @@ function updateHeroFromGame(item) {
   }
 
   if (badge) badge.textContent = `Featured · ${formatCategory(item.category)}`;
+  if (card) {
+    card.classList.add("is-hero-active");
+    setTimeout(function () {
+      card.classList.remove("is-hero-active");
+    }, 700);
+  }
+}
+
+function startHeroRotation(items) {
+  heroRotationItems = items.filter(function (g) {
+    return g && g.namespace;
+  });
+  heroRotationIndex = 0;
+  if (heroRotationTimer) {
+    clearInterval(heroRotationTimer);
+    heroRotationTimer = null;
+  }
+  if (!heroRotationItems.length) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+  heroRotationTimer = setInterval(function () {
+    if (!heroRotationItems.length) return;
+    heroRotationIndex = (heroRotationIndex + 1) % heroRotationItems.length;
+    updateHeroFromGame(heroRotationItems[heroRotationIndex]);
+  }, 9000);
 }
 
 function appendAllGames(items, replace) {
@@ -789,6 +801,7 @@ function applyHomepageEssentials(allPages) {
     };
   });
   setSectionCount("count-trending", trending.length);
+  startHeroRotation(trending.slice(0, 6));
 
   const newGames = allPages.slice(TRENDING_SHOW, TRENDING_SHOW + NEW_SHOW);
   if (newGrid) {
@@ -828,7 +841,7 @@ function applyHomepageEssentials(allPages) {
     new CustomEvent("vixo:games-loaded", { detail: window.vixoGames })
   );
 
-  initLazyCategoryRows();
+  initCategoryRows();
 
   return true;
 }

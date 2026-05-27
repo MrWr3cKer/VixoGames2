@@ -1266,6 +1266,13 @@ main,
 }
 
 @media (max-width: 768px) {
+  .game-section {
+    margin-bottom: 2.4rem;
+  }
+
+  .game-grid {
+    gap: 1.35rem;
+  }
   .main-nav,
   .header-actions .search-wrap {
     display: none;

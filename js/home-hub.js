@@ -1,3 +1,30 @@
+var pendingCategoryScrollId = null;
+
+function getScrollOffsetTop() {
+  var header = document.querySelector(".site-header");
+  var headerH = header ? header.getBoundingClientRect().height : 72;
+  return headerH + 20;
+}
+
+function scrollToPageSection(target) {
+  var el =
+    typeof target === "string"
+      ? document.getElementById(target.replace(/^#/, ""))
+      : target;
+  if (!el) return false;
+
+  var top =
+    el.getBoundingClientRect().top +
+    (window.pageYOffset || window.scrollY || 0) -
+    getScrollOffsetTop();
+
+  window.scrollTo({
+    top: Math.max(0, top),
+    behavior: "smooth",
+  });
+  return true;
+}
+
 /**
  * CrazyGames-style hub: sidebar drawer + horizontal row scrollers
  */
@@ -17,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   window.scrollTo(0, 0);
 
+  window.vixoScrollToSection = scrollToPageSection;
   populateHubCategories();
   initHubSidebar();
   initGameRowScrollers();
@@ -110,11 +138,29 @@ function initHubSidebar() {
     var id = href.slice(1);
     if (!id) return;
     var target = document.getElementById(id);
-    if (!target) return;
+    if (!target) {
+      pendingCategoryScrollId = id;
+      return;
+    }
+    pendingCategoryScrollId = null;
 
     window.setTimeout(function () {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 280);
+      scrollToPageSection(target);
+    }, isDrawer() ? 280 : 0);
+  }
+
+  if (sidebar) {
+    sidebar.addEventListener("click", function (e) {
+      var link = e.target.closest("a[href^='#']");
+      if (!link) return;
+
+      var href = link.getAttribute("href");
+      if (!href || href === "#") return;
+
+      e.preventDefault();
+      if (isDrawer()) closeNav();
+      scrollToHashTarget(href);
+    });
   }
 
   if (toggle) {
@@ -129,20 +175,6 @@ function initHubSidebar() {
 
   if (backdrop) {
     backdrop.addEventListener("click", closeNav);
-  }
-
-  if (sidebar) {
-    sidebar.addEventListener("click", function (e) {
-      var link = e.target.closest("a[href^='#']");
-      if (!link || !isDrawer()) return;
-
-      var href = link.getAttribute("href");
-      if (!href || href === "#") return;
-
-      e.preventDefault();
-      closeNav();
-      scrollToHashTarget(href);
-    });
   }
 
   document.addEventListener("keydown", function (e) {
@@ -182,5 +214,10 @@ window.vixoInitGameRowScrollers = initGameRowScrollers;
 document.addEventListener("vixo:category-mounted", function () {
   if (document.body.classList.contains("home-crazy")) {
     initGameRowScrollers();
+    if (pendingCategoryScrollId) {
+      var late = document.getElementById(pendingCategoryScrollId);
+      if (late) scrollToPageSection(late);
+      pendingCategoryScrollId = null;
+    }
   }
 });

@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initFavoriteDelegation();
   initLibraryControls();
   initPersonalSections();
+  initRandomHeroButton();
   document.addEventListener("vixo:games-loaded", function () {
     if (window.vixoStorage?.upgradeStoredRefs()) {
       document.dispatchEvent(new CustomEvent("vixo:recent-updated"));
@@ -20,6 +21,22 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("vixo:recent-updated", initPersonalSections);
   document.addEventListener("vixo:category-mounted", syncAllFavoriteButtons);
 });
+
+function initRandomHeroButton() {
+  const btn = document.getElementById("hero-random");
+  if (!btn) return;
+  btn.addEventListener("click", function () {
+    const helpers = window.vixoSearchHelpers;
+    const list =
+      (window.vixoGames || []).length > 0
+        ? window.vixoGames
+        : window.vixoAllGridItems || [];
+    if (!helpers || !helpers.playUrl || !list.length) return;
+    const pick = list[Math.floor(Math.random() * list.length)];
+    const url = helpers.playUrl(pick);
+    if (url) window.location.href = url;
+  });
+}
 
 function initFavoriteDelegation() {
   document.body.addEventListener("click", function (e) {
@@ -275,7 +292,7 @@ function showSearchEmptySuggestions(query) {
         filterGamesByChip(c.filter);
       }
       const target = document.querySelector(c.href);
-      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (target) scrollToSection(target);
       const input = document.getElementById("search-input");
       if (input) {
         input.value = "";
