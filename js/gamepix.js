@@ -464,6 +464,12 @@ function mountLazyCategorySections(categoryResults) {
   });
 
   if (!pending.length) return;
+  window.vixoMountedCategories = pending.map(function (r) {
+    return { slug: r.config.slug, title: r.config.title };
+  });
+  document.dispatchEvent(
+    new CustomEvent("vixo:categories-ready", { detail: window.vixoMountedCategories })
+  );
 
   const observer = new IntersectionObserver(
     function (entries) {
@@ -517,7 +523,7 @@ function createCategorySection(config, items) {
     ? `
     <div class="section-head section-head--hub">
       <h2>${config.title}</h2>
-      <a href="#library" class="section-view-all">View all</a>
+      <a href="categories.html?cat=${encodeURIComponent(config.slug)}&title=${encodeURIComponent(config.title)}" class="section-view-all">View more</a>
       <span class="see-all section-count-inline" hidden>Showing ${initialCount} games</span>
     </div>
     <div class="game-row-wrap">
@@ -527,11 +533,6 @@ function createCategorySection(config, items) {
       <div class="game-grid game-grid--row game-grid--hub" data-grid></div>
       <button type="button" class="game-row-scroll game-row-scroll--next" aria-label="Scroll right">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
-    </div>
-    <div class="load-more-wrap category-load-more-wrap">
-      <button type="button" class="btn btn-primary btn-load-more btn-load-more--category" data-category-slug="${config.slug}">
-        Load more games
       </button>
     </div>
   `
@@ -544,11 +545,6 @@ function createCategorySection(config, items) {
       <span class="see-all section-count-inline">Showing ${initialCount} games</span>
     </div>
     <div class="game-grid game-grid--dense game-grid--row" data-grid></div>
-    <div class="load-more-wrap category-load-more-wrap">
-      <button type="button" class="btn btn-primary btn-load-more btn-load-more--category" data-category-slug="${config.slug}">
-        Load more games
-      </button>
-    </div>
   `;
 
   const grid = section.querySelector("[data-grid]");
@@ -557,13 +553,6 @@ function createCategorySection(config, items) {
 
   const state = categorySectionState.get(config.slug);
   state.shown = initial.length;
-
-  const btn = section.querySelector(".btn-load-more--category");
-  if (btn) {
-    btn.addEventListener("click", function () {
-      loadMoreCategoryGames(config.slug);
-    });
-  }
 
   updateCategorySectionUi(config.slug);
 

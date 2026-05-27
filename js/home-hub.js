@@ -14,13 +14,25 @@ function populateHubCategories() {
   var list = window.VIXO_CATEGORIES;
   if (!nav || !list || !list.length) return;
 
+  var isSmall = window.matchMedia("(max-width: 768px)").matches;
+  var visible = isSmall ? list.slice(0, 24) : list;
   nav.innerHTML = "";
-  list.forEach(function (cat) {
+  visible.forEach(function (cat) {
     var a = document.createElement("a");
     a.href = "#cat-" + cat.slug;
     a.textContent = cat.title;
     nav.appendChild(a);
   });
+
+  var oldMore = document.getElementById("hub-cat-more");
+  if (oldMore) oldMore.remove();
+  if (isSmall && list.length > visible.length) {
+    var more = document.createElement("a");
+    more.id = "hub-cat-more";
+    more.href = "#library";
+    more.textContent = "See all categories";
+    nav.parentElement.appendChild(more);
+  }
 }
 
 document.addEventListener("vixo:games-loaded", function () {

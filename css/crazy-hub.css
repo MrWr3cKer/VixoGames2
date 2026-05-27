@@ -187,9 +187,9 @@
   line-height: 1.35;
   color: var(--text-muted);
   border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
   transition: color 0.2s, background 0.2s;
 }
 
@@ -487,7 +487,9 @@
   }
 
   .game-row-scroll {
-    display: none;
+    display: grid;
+    width: 34px;
+    height: 34px;
   }
 
   .game-row-wrap .game-grid--row {
@@ -503,6 +505,48 @@
 
   .home-crazy .menu-toggle {
     display: flex;
+  }
+
+  .home-crazy {
+    --hub-row-card: 44vw;
+  }
+
+  .game-row-wrap .game-card-link {
+    aspect-ratio: 16 / 10;
+  }
+
+  .game-row-wrap .game-card--featured {
+    flex-basis: 62vw;
+  }
+
+  .home-crazy .section-head--hub h2 {
+    font-size: 1.05rem;
+  }
+
+  .home-crazy .section-view-all {
+    font-size: 0.78rem;
+  }
+
+  .hub-sidebar {
+    width: min(90vw, 320px);
+  }
+
+  .hub-cat-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+    padding-right: 0.75rem;
+  }
+
+  .hub-cat-nav a {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .hub-cat-nav a:hover {
+    background: rgba(124, 58, 237, 0.22);
   }
 }
 
