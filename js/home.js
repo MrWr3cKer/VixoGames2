@@ -137,15 +137,6 @@ function initPersonalSections() {
   const recent = window.vixoStorage.getRecent();
   const favs = window.vixoStorage.getFavorites();
 
-  const playAgainSec = document.getElementById("play-again");
-  const playAgainGrid = document.getElementById("play-again-grid");
-  if (playAgainSec && playAgainGrid && recent[0]) {
-    playAgainSec.classList.remove("is-hidden");
-    renderRefCards(playAgainGrid, [recent[0]], "");
-  } else if (playAgainSec) {
-    playAgainSec.classList.add("is-hidden");
-  }
-
   const recentSec = document.getElementById("recent-games");
   const recentGrid = document.getElementById("recent-grid");
   if (recentSec && recentGrid) {
