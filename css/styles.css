@@ -1433,18 +1433,20 @@ main,
   display: block;
 }
 
+/* Single-column play layout: game on top, recommendations full width below */
 .play-layout {
   position: relative;
   z-index: 1;
   flex: 1;
-  display: grid;
-  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(220px, 260px);
-  gap: 1.5rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.75rem;
   padding: 1.25rem 1.5rem 2.5rem;
-  max-width: 1680px;
+  max-width: min(1280px, 100%);
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .play-center {
@@ -1452,6 +1454,8 @@ main,
   flex-direction: column;
   align-items: center;
   min-width: 0;
+  width: 100%;
+  order: 1;
 }
 
 .play-stage-shell {
@@ -1536,6 +1540,12 @@ main,
   max-width: min(100%, 420px);
 }
 
+@media (min-width: 768px) {
+  .play-stage-shell:has(.game-stage--portrait) {
+    max-width: min(100%, 560px);
+  }
+}
+
 .game-stage.is-fullscreen,
 .game-stage:fullscreen {
   width: 100vw !important;
@@ -1618,12 +1628,22 @@ html.vixo-fs-active body {
 }
 
 .play-sidebar {
-  position: sticky;
-  top: 5.5rem;
-  max-height: calc(100vh - 6rem);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) transparent;
+  position: static;
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  order: 2;
+}
+
+.play-sidebar--right {
+  order: 3;
+}
+
+.play-sidebar .similar-list,
+.play-sidebar--right .similar-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.85rem;
 }
 
 .sidebar-head {
@@ -1719,9 +1739,9 @@ html.vixo-fs-active body {
   padding: 0.5rem 0;
 }
 
+/* Duplicate of sidebar list — hidden; sidebars are full width below the game */
 .play-similar-mobile {
-  display: none;
-  grid-column: 1 / -1;
+  display: none !important;
 }
 
 .similar-list--grid {
@@ -1744,93 +1764,38 @@ html.vixo-fs-active body {
   display: none;
 }
 
-@media (max-width: 1200px) {
-  .play-page:not(.has-ad-rail) .play-layout {
-    grid-template-columns: minmax(180px, 200px) minmax(0, 1fr) minmax(180px, 200px);
-    gap: 1rem;
-    padding: 1rem;
-  }
-}
-
 @media (max-width: 1023px) {
   .play-layout {
-    grid-template-columns: 1fr;
-    max-width: 960px;
+    padding: 1rem max(1rem, env(safe-area-inset-right)) 2rem
+      max(1rem, env(safe-area-inset-left));
+    gap: 1.35rem;
   }
 
-  .play-sidebar {
+  .play-sidebar--right {
     display: none;
   }
 
-  .play-similar-mobile {
-    display: block;
-  }
-
-  .play-stage-shell {
-    max-width: 100%;
+  .play-sidebar .similar-list {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.65rem;
   }
 }
 
-/* Desktop play: large game on top, recommendations below (scroll down) */
 @media (min-width: 1024px) {
-  .play-page .play-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2rem;
-    max-width: none;
-    width: 100%;
-    padding: 1.25rem 0.75rem 3rem;
-    box-sizing: border-box;
-  }
-
-  .play-page .play-center {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    order: 1;
-  }
-
   .play-page .play-stage-shell {
-    width: 100%;
     max-width: min(100%, var(--game-max-width, 1040px));
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .play-page .play-layout:has(.game-stage--portrait) .play-stage-shell {
-    max-width: min(100%, 420px);
+    max-width: min(100%, 560px);
   }
 
   .play-page .play-sidebar,
   .play-page .play-sidebar--right {
-    display: block;
-    position: static;
-    width: 100%;
-    max-width: none;
-    max-height: none;
-    overflow: visible;
     padding-top: 1.25rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .play-page .play-sidebar {
-    order: 2;
-  }
-
-  .play-page .play-sidebar--right {
-    order: 3;
-  }
-
-  .play-page .play-sidebar .similar-list,
-  .play-page .play-sidebar--right .similar-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 0.85rem;
-  }
-
-  .play-page .play-similar-mobile {
-    display: none;
   }
 }
 

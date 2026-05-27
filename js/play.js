@@ -96,13 +96,19 @@ function applyGameStageSize(stage, params) {
       stage.classList.add("game-stage--landscape");
       stage.classList.remove("game-stage--portrait");
     } else {
-      maxWidth = "min(100%, 420px)";
+      maxWidth =
+        window.matchMedia("(min-width: 768px)").matches
+          ? "min(100%, 560px)"
+          : "min(100%, 420px)";
       stage.classList.add("game-stage--portrait");
       stage.classList.remove("game-stage--landscape");
     }
   } else if (orientation === "portrait") {
     aspect = "3 / 4";
-    maxWidth = "min(100%, 420px)";
+    maxWidth =
+      window.matchMedia("(min-width: 768px)").matches
+        ? "min(100%, 560px)"
+        : "min(100%, 420px)";
     stage.classList.add("game-stage--portrait");
     stage.classList.remove("game-stage--landscape");
   } else if (orientation === "landscape") {
@@ -685,7 +691,7 @@ async function initPlayPage() {
     }
   }
 
-  if (titleEl) titleEl.textContent = "Loading game…";
+  if (titleEl) titleEl.textContent = formatCategory(slug);
 
   const game = await fetchGameBySlug(slug);
   if (game) publishGamesForThumbBg([game]);
@@ -697,7 +703,7 @@ async function initPlayPage() {
         return p;
       })();
 
-  const title = game?.title || params.get("title") || slug;
+  const title = game?.title || params.get("title") || formatCategory(slug);
   const namespace = slug;
   const category = game?.category || params.get("category") || "";
   const embedUrl = getEmbedUrlForSlug(slug);
