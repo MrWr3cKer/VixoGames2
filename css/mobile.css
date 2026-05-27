@@ -1,0 +1,202 @@
+/**
+ * Mobile viewport & overflow fixes — prevents “zoomed in” feel on phones
+ */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
+  width: 100%;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.site-body,
+.page-content,
+.hub-shell,
+.hub-main,
+.home-main {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Background plane must not force horizontal scroll (100vmax was the main culprit) */
+.game-thumb-bg {
+  max-width: 100%;
+  overflow: hidden;
+  contain: strict;
+}
+
+.game-thumb-bg__plane {
+  min-width: 0;
+  min-height: 0;
+  width: max(var(--plane-w), 120%);
+  height: max(var(--plane-h), 120%);
+}
+
+/* iOS: 16px+ on inputs stops focus-zoom */
+.home-crazy .site-header .search input,
+.contact-field input,
+.contact-field select,
+.contact-field textarea,
+.library-control select {
+  font-size: max(16px, 1rem);
+}
+
+/* ─── Homepage header: two rows on phones so nothing overflows ─── */
+@media (max-width: 640px) {
+  :root {
+    /* Two-row header: logo row + full-width search */
+    --header-h: 100px;
+    --effective-header-h: 100px;
+  }
+
+  .home-crazy .site-header {
+    flex-wrap: wrap;
+    align-items: center;
+    height: auto;
+    min-height: var(--header-h);
+    gap: 0.45rem 0.5rem;
+    padding: 0.45rem max(0.65rem, env(safe-area-inset-right))
+      0.55rem max(0.65rem, env(safe-area-inset-left));
+  }
+
+  .home-crazy .site-header .logo {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .home-crazy .site-header .logo-img {
+    height: 36px;
+    max-width: min(140px, 38vw);
+  }
+
+  .home-crazy .site-header .header-contact-btn {
+    order: 2;
+    margin-left: 0;
+    padding: 0.42rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .home-crazy .site-header .menu-toggle--hub {
+    order: 3;
+    width: 40px;
+    height: 40px;
+  }
+
+  .home-crazy .site-header .header-actions {
+    order: 4;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .home-crazy .site-header .search {
+    padding: 0.5rem 0.85rem 0.5rem 2.35rem;
+  }
+
+  .hub-welcome {
+    padding: 1.15rem 1rem 1.35rem;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hub-welcome h1 {
+    font-size: clamp(1.2rem, 5.5vw, 1.45rem);
+  }
+
+  .hub-welcome__desc {
+    font-size: 0.9rem;
+  }
+
+  .hub-welcome__actions {
+    gap: 0.55rem;
+  }
+
+  .hub-welcome__actions .btn {
+    font-size: 0.88rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .game-row-wrap {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+
+  .home-crazy .home-main {
+    padding-left: max(0.65rem, env(safe-area-inset-left));
+    padding-right: max(0.65rem, env(safe-area-inset-right));
+  }
+
+  .home-crazy .hub-main .site-footer {
+    padding-left: max(0.65rem, env(safe-area-inset-left));
+    padding-right: max(0.65rem, env(safe-area-inset-right));
+  }
+}
+
+@media (max-width: 380px) {
+  .home-crazy .site-header .header-contact-btn {
+    padding: 0.42rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  .home-crazy {
+    --hub-row-card: min(132px, 42vw);
+  }
+
+  .hub-welcome__meta {
+    gap: 0.35rem;
+  }
+
+  .hub-pill {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+  }
+}
+
+/* Static / contact pages */
+@media (max-width: 640px) {
+  .static-page {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .site-header:not(.site-header--hub) {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--header-h);
+    gap: 0.5rem;
+    padding: 0.5rem max(0.75rem, env(safe-area-inset-right))
+      0.5rem max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .site-header:not(.site-header--hub) .logo-img {
+    height: 38px;
+    max-width: 42vw;
+  }
+
+  .site-header:not(.site-header--hub) .btn-ghost {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.65rem;
+  }
+}
+
+/* Play page */
+@media (max-width: 640px) {
+  .play-header {
+    padding-left: max(0.65rem, env(safe-area-inset-left));
+    padding-right: max(0.65rem, env(safe-area-inset-right));
+  }
+
+  .play-layout {
+    padding-left: max(0.65rem, env(safe-area-inset-left));
+    padding-right: max(0.65rem, env(safe-area-inset-right));
+  }
+}

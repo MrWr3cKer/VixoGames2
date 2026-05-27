@@ -16,7 +16,7 @@ const SHELL = [
   "css/crazy-hub.css",
   "css/contact.css",
   "css/categories-page.css",
-  "css/thumb-bg.css",
+  "css/mobile.css",
   "js/routes.js",
   "js/animations.js",
   "js/magic-bg.js",
