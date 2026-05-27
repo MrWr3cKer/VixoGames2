@@ -1,0 +1,145 @@
+/* Contact form — matches VixoGames dark theme */
+
+.contact-page {
+  max-width: 560px;
+}
+
+.contact-form {
+  margin-top: 1.5rem;
+  padding: 1.5rem 1.35rem 1.35rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    145deg,
+    rgba(30, 24, 56, 0.75),
+    rgba(12, 10, 20, 0.88)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.contact-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.contact-field input,
+.contact-field select,
+.contact-field textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: rgba(22, 18, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  outline: none;
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.contact-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239b92b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+}
+
+.contact-field textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.5;
+}
+
+.contact-field input::placeholder,
+.contact-field textarea::placeholder {
+  color: rgba(155, 146, 184, 0.65);
+}
+
+.contact-field input:focus,
+.contact-field select:focus,
+.contact-field textarea:focus {
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
+}
+
+.contact-field input:invalid:not(:placeholder-shown),
+.contact-field select:invalid:not(:placeholder-shown),
+.contact-field textarea:invalid:not(:placeholder-shown) {
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.contact-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.15rem 0 0;
+}
+
+.contact-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contact-actions {
+  margin-top: 0.35rem;
+}
+
+.contact-submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.contact-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+
+.contact-status {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  min-height: 1.35em;
+}
+
+.contact-status.is-success {
+  color: #86efac;
+}
+
+.contact-status.is-error {
+  color: #fca5a5;
+}
+
+@media (max-width: 768px) {
+  .contact-form {
+    padding: 1.25rem 1rem;
+  }
+
+  .contact-field input,
+  .contact-field select,
+  .contact-field textarea {
+    font-size: 1rem;
+    padding: 0.8rem 0.9rem;
+  }
+
+  .contact-page h1 {
+    font-size: 1.65rem;
+  }
+}

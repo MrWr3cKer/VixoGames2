@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Kontakt VixoGames — rapporter bugs, foreslå spill eller ta kontakt for samarbeid." />
+  <title>Kontakt – VixoGames</title>
+  <link rel="icon" href="logo/logo.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=8" />
+  <link rel="stylesheet" href="css/kid-friendly.css?v=2" />
+  <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
+  <link rel="stylesheet" href="css/ads.css?v=24" />
+  <link rel="stylesheet" href="css/thumb-bg.css?v=12" />
+  <link rel="stylesheet" href="css/contact.css?v=1" />
+  <link rel="preconnect" href="https://data527.click" crossorigin />
+</head>
+<body class="has-ad-rail has-thumb-bg">
+  <div class="bg-glow bg-glow--fantasy" aria-hidden="true"></div>
+  <div class="game-thumb-bg" id="game-thumb-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <img src="logo/logo.png" alt="VixoGames" class="logo-img" width="180" height="52" />
+    </a>
+    <a href="index.html" class="btn btn-ghost">← Tilbake til spill</a>
+  </header>
+
+  <div class="site-body">
+    <aside class="ad-rail ad-rail--left" aria-label="Advertisement left">
+      <div class="ad-rail__slot">
+        <ins style="width: 300px;height:1050px" data-width="300" data-height="1050" data-max_width="300" class="y1dce78a548" data-domain="//data527.click" data-affquery="/af9ac30bdbdc9295466f/1dce78a548/?placementName=banner2"></ins>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      <main class="static-page contact-page">
+        <h1>Kontakt oss</h1>
+        <p class="static-lead">
+          Har du funnet en bug, et spillforslag eller vil du samarbeide? Send oss en melding — vi svarer så fort vi kan.
+        </p>
+
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="contact-field">
+            <label for="contact-category">Kategori</label>
+            <select id="contact-category" name="category" required>
+              <option value="">Velg kategori…</option>
+              <option value="bug">Rapporter en bug</option>
+              <option value="game">Forslag til spill</option>
+              <option value="partnership">Samarbeid</option>
+              <option value="other">Annet</option>
+            </select>
+          </div>
+
+          <div class="contact-field">
+            <label for="contact-title">Overskrift</label>
+            <input
+              type="text"
+              id="contact-title"
+              name="title"
+              required
+              maxlength="120"
+              placeholder="Kort oppsummering"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="contact-field">
+            <label for="contact-message">Melding</label>
+            <textarea
+              id="contact-message"
+              name="message"
+              required
+              maxlength="2000"
+              rows="6"
+              placeholder="Beskriv buggen, forslaget eller henvendelsen din…"
+            ></textarea>
+          </div>
+
+          <div class="contact-field">
+            <label for="contact-info">Kontaktinfo</label>
+            <input
+              type="text"
+              id="contact-info"
+              name="contact"
+              required
+              maxlength="200"
+              placeholder="Discord-brukernavn eller e-post"
+              autocomplete="email"
+            />
+            <p class="contact-hint">Vi bruker dette kun for å svare deg.</p>
+          </div>
+
+          <!-- Honeypot — skjult for bots -->
+          <div class="contact-honeypot" aria-hidden="true">
+            <label for="contact-website">Nettsted</label>
+            <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="contact-actions">
+            <button type="submit" class="btn btn-primary contact-submit" id="contact-submit">
+              Send
+            </button>
+          </div>
+
+          <p id="contact-status" class="contact-status" role="status" aria-live="polite"></p>
+        </form>
+      </main>
+
+      <footer class="site-footer site-footer--static">
+        <p class="footer-copy">
+          © 2026 VixoGames ·
+          <a href="about.html">Om oss</a> ·
+          <a href="privacy.html">Personvern</a> ·
+          <a href="index.html">Hjem</a>
+        </p>
+      </footer>
+    </div>
+
+    <aside class="ad-rail ad-rail--right" aria-label="Advertisement right">
+      <div class="ad-rail__slot">
+        <ins style="width: 300px;height:1050px" data-width="300" data-height="1050" data-max_width="300" class="j23f8e8e243" data-domain="//data527.click" data-affquery="/af9ac30bdbdc9295466f/23f8e8e243/?placementName=banner4"><script src="//data527.click/js/responsive.js" async></script></ins>
+      </div>
+    </aside>
+  </div>
+
+  <script src="js/ad-slot.js?v=11" defer></script>
+  <script src="js/thumb-bg.js?v=11" defer></script>
+  <script src="js/contact.js?v=1" defer></script>
+</body>
+</html>
