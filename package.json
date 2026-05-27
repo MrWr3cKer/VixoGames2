@@ -1,0 +1,23 @@
+{
+  "name": "vixo-games",
+  "version": "1.0.0",
+  "description": "VixoGames - Free Online Browser Games",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrWr3cKer/VixoGames2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrWr3cKer/VixoGames2/issues"
+  },
+  "homepage": "https://github.com/MrWr3cKer/VixoGames2#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
