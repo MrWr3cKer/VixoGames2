@@ -1,0 +1,79 @@
+.page-category .category-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+}
+
+.page-category .category-back-btn {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.category-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.category-breadcrumb a {
+  color: var(--accent-bright);
+  text-decoration: none;
+}
+
+.category-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.category-page-head {
+  margin-bottom: 1.5rem;
+}
+
+.category-page-head h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.65rem, 4vw, 2.25rem);
+}
+
+.category-page-lead {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+.category-page-count {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-bright);
+}
+
+.category-page-section {
+  padding-top: 0;
+}
+
+.category-page-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.category-page-status a {
+  color: var(--accent-bright);
+}
+
+@media (max-width: 640px) {
+  .page-category .site-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .page-category .category-back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

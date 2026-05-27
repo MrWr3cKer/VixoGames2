@@ -177,6 +177,20 @@ function gamePixImageUrl(imageUrl, width = 320) {
   }
 }
 
+function getCategoryPageUrl(cat) {
+  const slug = typeof cat === "string" ? cat : cat.slug;
+  const title =
+    typeof cat === "string"
+      ? formatCategory(slug)
+      : cat.title || formatCategory(slug);
+  return (
+    "categories.html?cat=" +
+    encodeURIComponent(slug) +
+    "&title=" +
+    encodeURIComponent(title)
+  );
+}
+
 function getPlayPageUrl(item) {
   if (item.namespace && typeof window !== "undefined" && window.vixoRoutes) {
     return window.vixoRoutes.getGamePlayPath(item);
@@ -523,7 +537,7 @@ function createCategorySection(config, items) {
     ? `
     <div class="section-head section-head--hub">
       <h2>${config.title}</h2>
-      <a href="categories.html?cat=${encodeURIComponent(config.slug)}&title=${encodeURIComponent(config.title)}" class="section-view-all">View more</a>
+      <a href="${getCategoryPageUrl(config)}" class="section-view-all">View more</a>
       <span class="see-all section-count-inline" hidden>Showing ${initialCount} games</span>
     </div>
     <div class="game-row-wrap">
@@ -882,6 +896,18 @@ document.addEventListener("vixo:category-mounted", function () {
   // With pretty URLs as the default, no need to patch hrefs.
 });
 
+window.vixoGamePix = {
+  fetchPage: fetchGamePixGamesSafe,
+  fetchPageRange: fetchGamePixPageRange,
+  appendGameCards: appendGameCards,
+  renderGameCards: renderGameCards,
+  categoryCardOptions: categoryCardOptions,
+  dedupeGames: dedupeGames,
+  formatCategory: formatCategory,
+  getCategoryPageUrl: getCategoryPageUrl,
+  PAGE_SIZE: GAMEPIX_PAGE_SIZE,
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   loadGamePixHomepage();
 
@@ -907,7 +933,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
     } else {
-      navigator.serviceWorker.register("sw.js?v=17").then(function (reg) {
+      navigator.serviceWorker.register("sw.js?v=18").then(function (reg) {
         reg.update();
       }).catch(function () {});
     }
