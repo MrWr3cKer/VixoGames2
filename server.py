@@ -13,6 +13,14 @@ class VixoHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
 
+    def end_headers(self):
+        path = self.path.split("?", 1)[0].lower()
+        if path.endswith((".html", ".js", ".css")) or path in ("/", ""):
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
+        super().end_headers()
+
     def _rewrite_game_slug_path(self):
         parsed = urlparse(self.path)
         path = parsed.path

@@ -130,7 +130,9 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
   flex-direction: column;
   overflow: hidden;
   padding: 0;
-  background: rgba(10, 8, 18, 0.72);
+  background: rgba(10, 8, 18, 0.38);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -257,7 +259,7 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
   padding: 1.15rem 1.25rem;
   margin-bottom: 1.5rem;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(30, 24, 56, 0.95), rgba(18, 14, 32, 0.98));
+  background: linear-gradient(135deg, rgba(30, 24, 56, 0.72), rgba(18, 14, 32, 0.78));
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
@@ -506,6 +508,25 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
     --hub-sidebar-w: 260px;
   }
 
+  html.hub-nav-lock,
+  html.hub-nav-lock body {
+    overflow: hidden;
+  }
+
+  body.hub-nav-lock {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  body.hub-nav-open .site-body,
+  body.hub-nav-open .hub-main,
+  body.hub-nav-open .page-content {
+    overflow: hidden;
+    touch-action: none;
+  }
+
   .hub-sidebar {
     position: fixed;
     left: 0;
@@ -521,6 +542,13 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
 
   body.hub-nav-open .hub-sidebar {
     transform: translateX(0);
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+
+  body.hub-nav-open .hub-cat-nav {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   body.hub-nav-open .hub-sidebar-backdrop {

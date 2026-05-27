@@ -65,9 +65,31 @@ function initHubSidebar() {
   var toggle = document.querySelector(".menu-toggle");
   var backdrop = document.getElementById("hub-sidebar-backdrop");
   var sidebar = document.getElementById("hub-sidebar");
+  var lockedScrollY = 0;
+
+  function isDrawer() {
+    return window.matchMedia("(max-width: 1023px)").matches;
+  }
+
+  function lockPageScroll() {
+    if (!isDrawer()) return;
+    lockedScrollY = window.scrollY || window.pageYOffset || 0;
+    document.documentElement.classList.add("hub-nav-lock");
+    document.body.classList.add("hub-nav-lock");
+    document.body.style.top = "-" + lockedScrollY + "px";
+  }
+
+  function unlockPageScroll() {
+    if (!document.body.classList.contains("hub-nav-lock")) return;
+    document.documentElement.classList.remove("hub-nav-lock");
+    document.body.classList.remove("hub-nav-lock");
+    document.body.style.top = "";
+    window.scrollTo(0, lockedScrollY);
+  }
 
   function closeNav() {
     document.body.classList.remove("hub-nav-open");
+    unlockPageScroll();
     if (toggle) {
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("aria-label", "Open menu");
@@ -76,10 +98,23 @@ function initHubSidebar() {
 
   function openNav() {
     document.body.classList.add("hub-nav-open");
+    lockPageScroll();
     if (toggle) {
       toggle.setAttribute("aria-expanded", "true");
       toggle.setAttribute("aria-label", "Close menu");
     }
+  }
+
+  function scrollToHashTarget(href) {
+    if (!href || href.charAt(0) !== "#") return;
+    var id = href.slice(1);
+    if (!id) return;
+    var target = document.getElementById(id);
+    if (!target) return;
+
+    window.setTimeout(function () {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 280);
   }
 
   if (toggle) {
@@ -97,17 +132,23 @@ function initHubSidebar() {
   }
 
   if (sidebar) {
-    sidebar.querySelectorAll("a[href^='#']").forEach(function (link) {
-      link.addEventListener("click", function () {
-        if (window.matchMedia("(max-width: 1023px)").matches) {
-          closeNav();
-        }
-      });
+    sidebar.addEventListener("click", function (e) {
+      var link = e.target.closest("a[href^='#']");
+      if (!link || !isDrawer()) return;
+
+      var href = link.getAttribute("href");
+      if (!href || href === "#") return;
+
+      e.preventDefault();
+      closeNav();
+      scrollToHashTarget(href);
     });
   }
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeNav();
+    if (e.key === "Escape" && document.body.classList.contains("hub-nav-open")) {
+      closeNav();
+    }
   });
 }
 

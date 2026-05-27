@@ -80,9 +80,10 @@ timeout /t 2 /nobreak >nul
 
 echo Opening browser (use a wide window — ad needs 1024px+ width)...
 echo If the ad is blank, try disabling ad blocker for localhost.
+echo If the moving thumbnail background is missing: Ctrl+F5 hard refresh.
 echo.
 
-start "" "http://localhost:%PORT%/index.html?fresh=1"
+start "" "http://localhost:%PORT%/index.html?fresh=thumb7"
 
 
 

@@ -7,14 +7,15 @@ const GAMEPIX_PAGE_SIZE = 48;
 const GAMEPIX_PAGE_SIZE_FALLBACK = 24;
 const GAMEPIX_FEED_BASE = "https://feeds.gamepix.com/v2/json";
 const FETCH_CHUNK_SIZE = 4;
-const FETCH_TIMEOUT_MS = 25000;
+const FETCH_TIMEOUT_MS = 15000;
 
 /** Main catalog pages — quick first, rest in background */
-const INITIAL_MAIN_PAGES = 4;
+const INITIAL_MAIN_PAGES = 3;
 const QUICK_LOAD_PAGES = 2;
-/** Per category row on homepage */
-const CATEGORY_PAGES_EACH = 2;
-const CATEGORY_BATCH_SIZE = 3;
+/** Per category row on homepage — page 2 only when page 1 is full */
+const CATEGORY_PAGES_EACH = 1;
+const CATEGORY_LAZY_MARGIN = "480px 0px";
+const MAX_CATEGORY_FETCHES = 2;
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
 const TRENDING_SHOW = 16;
@@ -71,13 +72,32 @@ async function fetchGamePixGames(page = 1, category = null) {
   }
 }
 
-async function fetchGamePixGamesSafe(page, category) {
+async function fetchGamePixGamesSafe(page, category, silent) {
   try {
     return await fetchGamePixGames(page, category);
   } catch (err) {
-    console.warn("GamePix page skipped:", page, category || "all", err.message || err);
+    if (!silent) {
+      console.warn("GamePix page skipped:", page, category || "all", err.message || err);
+    }
     return { items: [], nextUrl: null };
   }
+}
+
+/** Fetch category feed; avoid page 2+ when GamePix returns 400 for thin categories */
+async function fetchCategoryGames(catSlug, maxPages) {
+  const limit = maxPages || 1;
+  const first = await fetchGamePixGamesSafe(1, catSlug, true);
+  let merged = first.items.slice();
+
+  if (
+    limit > 1 &&
+    first.items.length >= Math.max(12, activePageSize * 0.75)
+  ) {
+    const second = await fetchGamePixGamesSafe(2, catSlug, true);
+    merged = merged.concat(second.items);
+  }
+
+  return dedupeGames(merged);
 }
 
 async function ensureFeedConnection() {
@@ -94,37 +114,132 @@ async function ensureFeedConnection() {
  */
 async function fetchGamePixPageRange(startPage, pageCount, category = null) {
   const merged = [];
+  const silent = !!category;
 
   for (let offset = 0; offset < pageCount; offset += FETCH_CHUNK_SIZE) {
     const chunkCount = Math.min(FETCH_CHUNK_SIZE, pageCount - offset);
-    const fetches = [];
+    let stopEarly = false;
+
     for (let i = 0; i < chunkCount; i++) {
-      fetches.push(fetchGamePixGamesSafe(startPage + offset + i, category));
-    }
-    const results = await Promise.all(fetches);
-    results.forEach(function (res) {
+      const page = startPage + offset + i;
+      const res = await fetchGamePixGamesSafe(page, category, silent);
       merged.push.apply(merged, res.items);
-    });
+
+      if (category && (!res.items.length || res.items.length < activePageSize * 0.6)) {
+        stopEarly = true;
+        break;
+      }
+    }
+
+    if (stopEarly) break;
   }
 
   return dedupeGames(merged);
 }
 
-async function fetchAllCategorySections() {
-  const results = [];
+let categoryLazyObserver = null;
+let categoryFetchActive = 0;
+const categoryFetchQueue = [];
+const categoryLoadedSlugs = new Set();
 
-  for (let i = 0; i < HOME_CATEGORIES.length; i += CATEGORY_BATCH_SIZE) {
-    const batch = HOME_CATEGORIES.slice(i, i + CATEGORY_BATCH_SIZE);
-    const batchResults = await Promise.all(
-      batch.map(async function (cat) {
-        const items = await fetchGamePixPageRange(1, CATEGORY_PAGES_EACH, cat.slug);
-        return { config: cat, items: items };
-      })
-    );
-    results.push.apply(results, batchResults);
+function registerMountedCategory(config) {
+  if (!window.vixoMountedCategories) window.vixoMountedCategories = [];
+  if (
+    window.vixoMountedCategories.some(function (c) {
+      return c.slug === config.slug;
+    })
+  ) {
+    return;
+  }
+  window.vixoMountedCategories.push({ slug: config.slug, title: config.title });
+  document.dispatchEvent(
+    new CustomEvent("vixo:categories-ready", {
+      detail: window.vixoMountedCategories.slice(),
+    })
+  );
+}
+
+function findCategoryConfig(slug) {
+  return HOME_CATEGORIES.find(function (c) {
+    return c.slug === slug;
+  });
+}
+
+async function fetchAndMountCategory(placeholder, slug) {
+  const config = findCategoryConfig(slug);
+  if (!config || categoryLoadedSlugs.has(slug)) return;
+  categoryLoadedSlugs.add(slug);
+
+  const items = await fetchCategoryGames(slug, CATEGORY_PAGES_EACH);
+  if (!placeholder.isConnected) return;
+
+  if (items.length < 4) {
+    placeholder.remove();
+    return;
   }
 
-  return results;
+  mergeIntoVixoGames(items);
+  registerMountedCategory(config);
+  placeholder.dataset.lazyLoaded = "1";
+  const section = createCategorySection(config, items);
+  placeholder.replaceWith(section);
+  document.dispatchEvent(new CustomEvent("vixo:category-mounted"));
+}
+
+function drainCategoryQueue() {
+  while (categoryFetchActive < MAX_CATEGORY_FETCHES && categoryFetchQueue.length) {
+    const job = categoryFetchQueue.shift();
+    categoryFetchActive++;
+    fetchAndMountCategory(job.placeholder, job.slug)
+      .catch(function () {})
+      .finally(function () {
+        categoryFetchActive--;
+        drainCategoryQueue();
+      });
+  }
+}
+
+function queueCategoryFetch(placeholder, slug) {
+  if (
+    placeholder.dataset.lazyLoaded === "1" ||
+    placeholder.dataset.lazyQueued === "1"
+  ) {
+    return;
+  }
+  placeholder.dataset.lazyQueued = "1";
+  categoryFetchQueue.push({ placeholder: placeholder, slug: slug });
+  drainCategoryQueue();
+}
+
+function initLazyCategoryRows() {
+  const categoryRoot = document.getElementById("category-sections");
+  if (!categoryRoot || categoryRoot.dataset.lazyInit === "1") return;
+  categoryRoot.dataset.lazyInit = "1";
+  categoryRoot.innerHTML = "";
+
+  HOME_CATEGORIES.forEach(function (cat) {
+    categoryRoot.appendChild(createCategoryPlaceholder(cat));
+  });
+
+  if (categoryLazyObserver) categoryLazyObserver.disconnect();
+
+  categoryLazyObserver = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        const placeholder = entry.target;
+        const slug = placeholder.dataset.lazyCategory;
+        if (!slug) return;
+        queueCategoryFetch(placeholder, slug);
+        categoryLazyObserver.unobserve(placeholder);
+      });
+    },
+    { rootMargin: CATEGORY_LAZY_MARGIN, threshold: 0.01 }
+  );
+
+  categoryRoot.querySelectorAll("[data-lazy-category]").forEach(function (el) {
+    categoryLazyObserver.observe(el);
+  });
 }
 
 function isLocalFilePage() {
@@ -221,7 +336,13 @@ function getItemLayout(item) {
 }
 
 function createGameCard(item, options = {}) {
-  const { large = false, tag = null, showFavorite = true, featured = false } = options;
+  const {
+    large = false,
+    tag = null,
+    showFavorite = true,
+    featured = false,
+    eager = false,
+  } = options;
   const playUrl = getPlayPageUrl(item);
   const imageSrc = gamePixImageUrl(item.banner_image || item.image, large ? 400 : 280);
   const category = formatCategory(item.category);
@@ -253,8 +374,11 @@ function createGameCard(item, options = {}) {
   img.className = "game-thumb-img";
   img.src = imageSrc;
   img.alt = item.title || "Game";
-  img.loading = "lazy";
+  img.loading = eager ? "eager" : "lazy";
   img.decoding = "async";
+  if (eager && "fetchPriority" in img) {
+    img.fetchPriority = "high";
+  }
 
   const overlay = document.createElement("div");
   overlay.className = "game-overlay";
@@ -399,7 +523,7 @@ async function loadMoreCategoryGames(slug) {
   btn.textContent = "Loading…";
 
   try {
-    const res = await fetchGamePixGamesSafe(state.nextPage, slug);
+    const res = await fetchGamePixGamesSafe(state.nextPage, slug, true);
     const incoming = res.items || [];
     const existing = new Set(
       state.items.map(function (g) {
@@ -466,51 +590,6 @@ function createCategoryPlaceholder(config) {
     </div>
   `;
   return section;
-}
-
-function mountLazyCategorySections(categoryResults) {
-  const categoryRoot = document.getElementById("category-sections");
-  if (!categoryRoot) return;
-
-  categoryRoot.innerHTML = "";
-  const pending = categoryResults.filter(function (r) {
-    return r.items.length >= 4;
-  });
-
-  if (!pending.length) return;
-  window.vixoMountedCategories = pending.map(function (r) {
-    return { slug: r.config.slug, title: r.config.title };
-  });
-  document.dispatchEvent(
-    new CustomEvent("vixo:categories-ready", { detail: window.vixoMountedCategories })
-  );
-
-  const observer = new IntersectionObserver(
-    function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        const placeholder = entry.target;
-        if (placeholder.dataset.lazyLoaded === "1") return;
-        const slug = placeholder.dataset.lazyCategory;
-        const result = pending.find(function (r) {
-          return r.config.slug === slug;
-        });
-        if (!result) return;
-        placeholder.dataset.lazyLoaded = "1";
-        const section = createCategorySection(result.config, result.items);
-        placeholder.replaceWith(section);
-        observer.unobserve(placeholder);
-        document.dispatchEvent(new CustomEvent("vixo:category-mounted"));
-      });
-    },
-    { rootMargin: "280px 0px", threshold: 0.01 }
-  );
-
-  pending.forEach(function (result) {
-    const placeholder = createCategoryPlaceholder(result.config);
-    categoryRoot.appendChild(placeholder);
-    observer.observe(placeholder);
-  });
 }
 
 function createCategorySection(config, items) {
@@ -603,6 +682,9 @@ function updateHeroFromGame(item) {
     img.className = "hero-thumb-img";
     img.src = gamePixImageUrl(item.banner_image || item.image, 520);
     img.alt = item.title || "";
+    img.loading = "eager";
+    img.decoding = "async";
+    if ("fetchPriority" in img) img.fetchPriority = "high";
     thumbEl.appendChild(img);
   }
 
@@ -703,6 +785,7 @@ function applyHomepageEssentials(allPages) {
       tag: index === 0 ? "top" : index < 4 ? "hot" : null,
       featured: index === 0,
       showFavorite: true,
+      eager: index < 3,
     };
   });
   setSectionCount("count-trending", trending.length);
@@ -745,30 +828,27 @@ function applyHomepageEssentials(allPages) {
     new CustomEvent("vixo:games-loaded", { detail: window.vixoGames })
   );
 
+  initLazyCategoryRows();
+
   return true;
 }
 
-function applyHomepageExtras(allPages, categoryResults) {
-  const categoryRoot = document.getElementById("category-sections");
-  if (categoryRoot && categoryResults && categoryResults.length) {
-    mountLazyCategorySections(categoryResults);
-  }
-
-  const library = dedupeGames(
-    allPages.concat(
-      (categoryResults || []).flatMap(function (r) {
-        return r.items;
-      })
-    )
-  );
-
-  window.vixoGames = library;
+function applyHomepageExtras(seedPages, extraPages) {
+  const allPages = dedupeGames(seedPages.concat(extraPages));
+  window.vixoGames = allPages;
 
   const statTotal = document.getElementById("stat-total");
-  if (statTotal) statTotal.textContent = `${library.length}+`;
+  if (statTotal) statTotal.textContent = `${allPages.length}+`;
 
-  const statCat = document.getElementById("stat-categories");
-  if (statCat) statCat.textContent = String(HOME_CATEGORIES.length);
+  const existing = new Set(
+    (window.vixoAllGridItems || []).map(function (g) {
+      return g.namespace;
+    })
+  );
+  const fresh = extraPages.filter(function (g) {
+    return g.namespace && !existing.has(g.namespace);
+  });
+  if (fresh.length) appendAllGames(fresh, false);
 
   document.dispatchEvent(
     new CustomEvent("vixo:games-loaded", { detail: window.vixoGames })
@@ -777,20 +857,17 @@ function applyHomepageExtras(allPages, categoryResults) {
 
 async function loadHomepageExtrasInBackground(seedPages) {
   try {
-    let allPages = seedPages.slice();
     const extraPageCount = Math.max(0, INITIAL_MAIN_PAGES - QUICK_LOAD_PAGES);
-    const [extraPages, categoryResults] = await Promise.all([
-      extraPageCount
-        ? fetchGamePixPageRange(QUICK_LOAD_PAGES + 1, extraPageCount, null)
-        : Promise.resolve([]),
-      fetchAllCategorySections(),
-    ]);
+    if (!extraPageCount) return;
 
-    if (extraPages.length) {
-      allPages = dedupeGames(allPages.concat(extraPages));
-    }
+    const extraPages = await fetchGamePixPageRange(
+      QUICK_LOAD_PAGES + 1,
+      extraPageCount,
+      null
+    );
+    if (!extraPages.length) return;
 
-    applyHomepageExtras(allPages, categoryResults);
+    applyHomepageExtras(seedPages, extraPages);
   } catch (err) {
     console.warn("Background homepage load:", err);
   }
@@ -898,6 +975,7 @@ document.addEventListener("vixo:category-mounted", function () {
 
 window.vixoGamePix = {
   fetchPage: fetchGamePixGamesSafe,
+  fetchCategoryGames: fetchCategoryGames,
   fetchPageRange: fetchGamePixPageRange,
   appendGameCards: appendGameCards,
   renderGameCards: renderGameCards,
@@ -917,8 +995,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
-    var host = window.location.hostname;
-    var isLocal = host === "localhost" || host === "127.0.0.1";
+  var host = window.location.hostname;
+  var isLocal =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "[::1]" ||
+    host === "::1";
     if (isLocal) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
         regs.forEach(function (reg) {
@@ -933,7 +1015,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
     } else {
-      navigator.serviceWorker.register("sw.js?v=18").then(function (reg) {
+      navigator.serviceWorker.register("sw.js?v=24").then(function (reg) {
         reg.update();
       }).catch(function () {});
     }

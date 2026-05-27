@@ -71,7 +71,5 @@ window.VIXO_CATEGORIES = [
   { slug: "archery", title: "Archery", desc: "Bows and targets" },
   { slug: "sniper", title: "Sniper", desc: "Long-range shots" },
   { slug: "rpg", title: "RPG", desc: "Role-playing quests" },
-  { slug: "mmo", title: "MMO", desc: "Massive online worlds" },
   { slug: "two-player", title: "2 Player", desc: "Play on one screen" },
-  { slug: "co-op", title: "Co-op", desc: "Team up together" },
 ];

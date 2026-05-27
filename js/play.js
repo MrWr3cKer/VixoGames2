@@ -192,6 +192,14 @@ function dedupeGames(items) {
   });
 }
 
+function publishGamesForThumbBg(items) {
+  if (!items || !items.length) return;
+  window.vixoGames = dedupeGames((window.vixoGames || []).concat(items));
+  document.dispatchEvent(
+    new CustomEvent("vixo:games-loaded", { detail: window.vixoGames })
+  );
+}
+
 function createSimilarCard(item) {
   const link = document.createElement("a");
   link.className = "similar-card";
@@ -292,6 +300,7 @@ async function loadTrendingSidebar(container, currentNamespace) {
     }
 
     renderSimilarList(container, trending);
+    publishGamesForThumbBg(pool);
   } catch (err) {
     console.warn("Trending sidebar:", err);
     container.innerHTML =
@@ -331,6 +340,7 @@ async function loadSimilarGames(currentNamespace, category) {
 
     renderSimilarList(left, similar);
     renderSimilarList(mobile, similar);
+    publishGamesForThumbBg(pool);
   } catch (err) {
     console.warn("Similar games:", err);
     const msg = '<p class="similar-empty">Could not load suggestions.</p>';
@@ -611,6 +621,7 @@ async function initPlayPage() {
   if (titleEl) titleEl.textContent = "Loading game…";
 
   const game = await fetchGameBySlug(slug);
+  if (game) publishGamesForThumbBg([game]);
   const params = game
     ? window.vixoRoutes.gameToSearchParams(game)
     : (function () {

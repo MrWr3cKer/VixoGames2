@@ -10,19 +10,23 @@
 
     gtag('config', 'AW-18191403026');
   </script>
-  <!-- Event snippet for Sidevisning conversion page -->
+  <!-- Event snippet for Sidevisning conversion page (deferred — not on critical path) -->
   <script>
-    gtag('event', 'conversion', {
+    function vixoTrackConversion() {
+      gtag('event', 'conversion', {
         'send_to': 'AW-18191403026/Ned0CP_7_7McEJKQq-JD',
         'value': 1.0,
         'currency': 'NOK'
-    });
+      });
+    }
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(vixoTrackConversion, { timeout: 5000 });
+    } else {
+      window.addEventListener('load', function () { setTimeout(vixoTrackConversion, 2000); });
+    }
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <meta name="description" content="VixoGames – play thousands of free browser games. Action, puzzle, multiplayer, arcade and more. No download." />
   <title>VixoGames – Free Online Games</title>
   <link rel="icon" href="logo/logo.png" type="image/png" />
@@ -36,12 +40,13 @@
   <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
   <link rel="stylesheet" href="css/kid-animations.css?v=2" />
   <link rel="stylesheet" href="css/ads.css?v=24" />
-  <link rel="stylesheet" href="css/home-pro.css?v=2" />
-  <link rel="stylesheet" href="css/crazy-hub.css?v=7" />
+  <link rel="stylesheet" href="css/crazy-hub.css?v=9" />
+  <link rel="stylesheet" href="css/thumb-bg.css?v=12" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
 <body class="has-ad-rail home-crazy">
   <div class="bg-glow bg-glow--fantasy" aria-hidden="true"></div>
+  <div class="game-thumb-bg" id="game-thumb-bg" aria-hidden="true"></div>
   <div class="magic-ripples" id="magic-ripples" aria-hidden="true"></div>
 
   <header class="site-header site-header--hub">
@@ -314,7 +319,7 @@
         <a href="#trending">Start playing</a>
       </div>
     </div>
-    <p class="footer-copy">© 2026 VixoGames · Games powered by GamePix · <span class="site-version">v10</span></p>
+    <p class="footer-copy">© 2026 VixoGames · Games powered by GamePix · <span class="site-version">v11</span></p>
   </footer>
 
     </div>
@@ -331,15 +336,16 @@
   </div>
 
   <!-- deploy: 2026-05-26 -->
-  <script src="js/categories.js?v=1" defer></script>
+  <script src="js/categories.js?v=2" defer></script>
   <script src="js/routes.js?v=4" defer></script>
   <script src="js/storage.js?v=3" defer></script>
-  <script src="js/ui.js?v=9" defer></script>
-  <script src="js/gamepix.js?v=17" defer></script>
+  <script src="js/ui.js?v=10" defer></script>
+  <script src="js/gamepix.js?v=20" defer></script>
   <script src="js/ad-slot.js?v=11" defer></script>
   <script src="js/magic-bg.js?v=2" defer></script>
+  <script src="js/thumb-bg.js?v=11" defer></script>
   <script src="js/animations.js?v=4" defer></script>
   <script src="js/home.js?v=2" defer></script>
-  <script src="js/home-hub.js?v=5" defer></script>
+  <script src="js/home-hub.js?v=6" defer></script>
 </body>
 </html>

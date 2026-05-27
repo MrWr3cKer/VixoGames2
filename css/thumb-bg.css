@@ -1,0 +1,229 @@
+/**
+ * Diagonal drifting game-thumbnail background (brick stagger)
+ */
+
+.game-thumb-bg {
+  --thumb-size: 88px;
+  --thumb-gap: 7px;
+  --plane-angle: 35deg;
+  --plane-w: 100vw;
+  --plane-h: 100vh;
+  --thumb-bg-blur: 5px;
+  --thumb-bg-brightness: 0.72;
+
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.game-thumb-bg.is-ready {
+  opacity: 1;
+}
+
+.game-thumb-bg__plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--plane-w);
+  height: var(--plane-h);
+  min-width: 100vmax;
+  min-height: 100vmax;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%) rotate(var(--plane-angle));
+  transform-origin: center center;
+  filter: blur(var(--thumb-bg-blur)) brightness(var(--thumb-bg-brightness));
+}
+
+.game-thumb-bg__track {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  will-change: transform;
+}
+
+.game-thumb-bg__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--thumb-gap);
+  padding-bottom: var(--thumb-gap);
+  flex-shrink: 0;
+}
+
+.game-thumb-bg__row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--thumb-gap);
+  flex-shrink: 0;
+}
+
+.game-thumb-bg__row.is-offset {
+  padding-left: calc((var(--thumb-size) + var(--thumb-gap)) * 0.5);
+}
+
+.game-thumb-bg__tile {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  flex: 0 0 var(--thumb-size);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  background: rgba(14, 11, 24, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.game-thumb-bg__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.82;
+}
+
+/* Very soft edge — keep grid visible across full viewport */
+.game-thumb-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 130% 130% at 50% 50%,
+    transparent 72%,
+    rgba(12, 10, 20, 0.22) 100%
+  );
+  pointer-events: none;
+}
+
+body.home-crazy .site-body {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
+body.home-crazy .site-header {
+  position: sticky;
+  z-index: 100;
+  background: rgba(12, 10, 20, 0.68) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.home-crazy .hub-main,
+.home-crazy .hub-shell,
+.home-crazy .page-content {
+  background: transparent !important;
+}
+
+.home-crazy .hub-sidebar {
+  background: rgba(10, 8, 18, 0.34) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.home-crazy .hub-welcome {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 24, 56, 0.65),
+    rgba(18, 14, 32, 0.72)
+  ) !important;
+}
+
+.home-crazy .home-main .game-section {
+  background: transparent !important;
+}
+
+.home-crazy .home-main .game-section--alt,
+.home-crazy .user-section,
+.home-crazy .game-section--library {
+  background: rgba(22, 18, 42, 0.28) !important;
+}
+
+/* Play page — same drifting thumb background as homepage */
+body.has-thumb-bg.play-page {
+  background: transparent;
+}
+
+body.has-thumb-bg.play-page .bg-glow {
+  opacity: 0.4;
+}
+
+body.has-thumb-bg.play-page .site-body {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
+body.has-thumb-bg.play-page .page-content {
+  background: transparent !important;
+}
+
+body.has-thumb-bg.play-page .play-header {
+  background: rgba(12, 10, 20, 0.68) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body.has-thumb-bg.play-page .play-sidebar,
+body.has-thumb-bg.play-page .play-similar-mobile {
+  background: rgba(22, 18, 42, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+body.has-thumb-bg.play-page .similar-card {
+  background: rgba(22, 18, 42, 0.55);
+}
+
+body.has-thumb-bg.play-page .play-stage-shell {
+  background: linear-gradient(
+    180deg,
+    rgba(30, 24, 56, 0.94),
+    rgba(12, 10, 20, 0.97)
+  );
+}
+
+@media (max-width: 768px) {
+  .game-thumb-bg {
+    --thumb-size: 64px;
+    --thumb-gap: 5px;
+    --thumb-bg-blur: 3px;
+  }
+
+  .game-thumb-bg__tile img {
+    opacity: 0.75;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .game-thumb-bg {
+    --thumb-size: 76px;
+    --thumb-gap: 6px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .game-thumb-bg {
+    --thumb-size: 88px;
+    --thumb-gap: 7px;
+  }
+
+  .game-thumb-bg__tile img {
+    opacity: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-thumb-bg__tile img {
+    opacity: 0.42;
+  }
+}

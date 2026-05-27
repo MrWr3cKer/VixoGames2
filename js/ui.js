@@ -52,12 +52,17 @@ document.addEventListener("vixo:routes-ready", function (ev) {
 });
 
 // Personal sections (favorites/recent/play again) can change after load.
-["vixo:recent-updated", "vixo:favorites-updated", "vixo:category-mounted"].forEach(function (evt) {
+["vixo:recent-updated", "vixo:favorites-updated"].forEach(function (evt) {
   document.addEventListener(evt, function () {
     window.requestAnimationFrame(function () {
       if (typeof refreshSearchIndex === "function") refreshSearchIndex();
+      scheduleNavScrollSpyRepaint();
     });
   });
+});
+
+document.addEventListener("vixo:category-mounted", function () {
+  scheduleNavScrollSpyRepaint();
 });
 });
 
@@ -306,7 +311,8 @@ function initSearchDropdown() {
   refreshSearchIndex();
 }
 
-let navScrollSpyObserver = null;
+let navScrollSpyScrollHandler = null;
+let navScrollSpyRepaintTimer = 0;
 let navClickLockUntil = 0;
 let navIndicatorPositioned = false;
 
@@ -389,6 +395,55 @@ function moveNavIndicator(nav, activeLink, instant) {
   }
 }
 
+function isNavSectionVisible(el) {
+  if (!el) return false;
+  if (el.classList.contains("is-hidden")) return false;
+  if (el.getAttribute("aria-hidden") === "true") return false;
+  const rect = el.getBoundingClientRect();
+  return rect.height > 8 && rect.width > 8;
+}
+
+function getScrollSpyAnchorY() {
+  const header = document.querySelector(".site-header");
+  const headerH = header ? header.getBoundingClientRect().height : 72;
+  return headerH + Math.min(96, Math.max(48, window.innerHeight * 0.1));
+}
+
+function pickActiveNavSection(sections) {
+  const visible = sections.filter(function (s) {
+    return isNavSectionVisible(s.el);
+  });
+  if (!visible.length) return sections[0] || null;
+
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+  if (scrollY < 48) {
+    return visible.find(function (s) {
+      return s.el.id === "trending";
+    }) || visible[0];
+  }
+
+  const anchorY = getScrollSpyAnchorY();
+  const ordered = visible.slice().sort(function (a, b) {
+    return a.el.getBoundingClientRect().top - b.el.getBoundingClientRect().top;
+  });
+
+  let active =
+    visible.find(function (s) {
+      return s.el.id === "trending";
+    }) || visible[0];
+
+  for (let i = 0; i < ordered.length; i++) {
+    const top = ordered[i].el.getBoundingClientRect().top;
+    if (top <= anchorY + 12) {
+      active = ordered[i];
+    } else {
+      break;
+    }
+  }
+
+  return active;
+}
+
 function initNavScrollSpy() {
   const nav = document.querySelector(".main-nav");
   if (!nav) return;
@@ -404,50 +459,50 @@ function initNavScrollSpy() {
 
   if (!sections.length) return;
 
-  if (navScrollSpyObserver) {
-    navScrollSpyObserver.disconnect();
+  if (navScrollSpyScrollHandler) {
+    window.removeEventListener("scroll", navScrollSpyScrollHandler);
+    window.removeEventListener("resize", navScrollSpyScrollHandler);
+    navScrollSpyScrollHandler = null;
   }
 
-  let scrollSpySnapFirst = true;
+  let ticking = false;
 
-  navScrollSpyObserver = new IntersectionObserver(
-    function (entries) {
-      if (Date.now() < navClickLockUntil) return;
+  function applyActive(match, instant) {
+    if (!match) return;
+    sections.forEach(function (s) {
+      s.link.classList.toggle("active", s.link === match.link);
+    });
+    moveNavIndicator(nav, match.link, instant);
+  }
 
-      const visible = entries
-        .filter(function (e) {
-          return e.isIntersecting;
-        })
-        .sort(function (a, b) {
-          return b.intersectionRatio - a.intersectionRatio;
-        });
+  function updateFromScroll(instant) {
+    ticking = false;
+    if (Date.now() < navClickLockUntil) return;
+    applyActive(pickActiveNavSection(sections), !!instant);
+  }
 
-      if (!visible.length) return;
+  navScrollSpyScrollHandler = function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      updateFromScroll(false);
+    });
+  };
 
-      const id = visible[0].target.id;
-      const match = sections.find(function (s) {
-        return s.el.id === id;
-      });
-      if (!match) return;
+  window.addEventListener("scroll", navScrollSpyScrollHandler, { passive: true });
+  window.addEventListener("resize", navScrollSpyScrollHandler, { passive: true });
 
-      const snap = scrollSpySnapFirst;
-      scrollSpySnapFirst = false;
-
-      sections.forEach(function (s) {
-        s.link.classList.toggle("active", s.link === match.link);
-      });
-      moveNavIndicator(nav, match.link, snap);
-    },
-    {
-      root: null,
-      rootMargin: "-15% 0px -55% 0px",
-      threshold: [0.1, 0.25, 0.4],
-    }
-  );
-
-  sections.forEach(function (s) {
-    navScrollSpyObserver.observe(s.el);
+  updateFromScroll(true);
+  requestAnimationFrame(function () {
+    updateFromScroll(true);
   });
+}
+
+function scheduleNavScrollSpyRepaint() {
+  window.clearTimeout(navScrollSpyRepaintTimer);
+  navScrollSpyRepaintTimer = window.setTimeout(function () {
+    if (navScrollSpyScrollHandler) navScrollSpyScrollHandler();
+  }, 100);
 }
 
 function getAllHomeCards() {
