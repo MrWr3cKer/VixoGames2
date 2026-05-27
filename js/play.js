@@ -475,28 +475,60 @@ function initFullscreen() {
   }
 
   function updateFsViewportHeight() {
-    const h = window.visualViewport
-      ? window.visualViewport.height
-      : window.innerHeight;
-    document.documentElement.style.setProperty(
-      "--vixo-fs-h",
-      Math.round(h) + "px"
-    );
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    const w = vv ? vv.width : window.innerWidth;
+    const top = vv ? vv.offsetTop : 0;
+    const left = vv ? vv.offsetLeft : 0;
+    const root = document.documentElement;
+    root.style.setProperty("--vixo-fs-h", Math.round(h) + "px");
+    root.style.setProperty("--vixo-fs-w", Math.round(w) + "px");
+    root.style.setProperty("--vixo-fs-top", Math.round(top) + "px");
+    root.style.setProperty("--vixo-fs-left", Math.round(left) + "px");
+  }
+
+  function scheduleFsViewportUpdates() {
+    updateFsViewportHeight();
+    [50, 150, 350, 600].forEach(function (ms) {
+      window.setTimeout(updateFsViewportHeight, ms);
+    });
+  }
+
+  function onFsViewportChange() {
+    if (!isMobileFullscreen()) return;
+    updateFsViewportHeight();
   }
 
   function bindFsViewport() {
-    if (fsViewportBound || !window.visualViewport) return;
+    if (fsViewportBound) return;
     fsViewportBound = true;
-    window.visualViewport.addEventListener("resize", updateFsViewportHeight);
-    window.visualViewport.addEventListener("scroll", updateFsViewportHeight);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onFsViewportChange);
+      window.visualViewport.addEventListener("scroll", onFsViewportChange);
+    }
+    window.addEventListener("resize", onFsViewportChange);
+    window.addEventListener("orientationchange", onFsOrientation);
+  }
+
+  function onFsOrientation() {
+    if (!isMobileFullscreen()) return;
+    scheduleFsViewportUpdates();
   }
 
   function unbindFsViewport() {
-    if (!fsViewportBound || !window.visualViewport) return;
+    if (!fsViewportBound) return;
     fsViewportBound = false;
-    window.visualViewport.removeEventListener("resize", updateFsViewportHeight);
-    window.visualViewport.removeEventListener("scroll", updateFsViewportHeight);
-    document.documentElement.style.removeProperty("--vixo-fs-h");
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onFsViewportChange);
+      window.visualViewport.removeEventListener("scroll", onFsViewportChange);
+    }
+    window.removeEventListener("resize", onFsViewportChange);
+    window.removeEventListener("orientationchange", onFsOrientation);
+    const root = document.documentElement;
+    root.style.removeProperty("--vixo-fs-h");
+    root.style.removeProperty("--vixo-fs-w");
+    root.style.removeProperty("--vixo-fs-top");
+    root.style.removeProperty("--vixo-fs-left");
   }
 
   function lockPageForFs() {
@@ -523,12 +555,11 @@ function initFullscreen() {
     const floater = document.getElementById("vixo-fs-exit");
     if (floater) floater.hidden = !on;
     if (on) {
-      lockPageForFs();
-      updateFsViewportHeight();
+      /* Avoid body position:fixed — breaks layout on iOS rotation */
+      scheduleFsViewportUpdates();
       bindFsViewport();
       window.setTimeout(focusGameFrame, 50);
     } else {
-      unlockPageForFs();
       unbindFsViewport();
     }
   }
@@ -647,12 +678,6 @@ function initFullscreen() {
 
   document.addEventListener("fullscreenchange", syncFullscreenUi);
   document.addEventListener("webkitfullscreenchange", syncFullscreenUi);
-
-  window.addEventListener("orientationchange", function () {
-    if (isMobileFullscreen()) {
-      window.setTimeout(updateFsViewportHeight, 120);
-    }
-  });
 
   syncFullscreenUi();
 }
