@@ -209,7 +209,7 @@ function getItemLayout(item) {
 }
 
 function createGameCard(item, options = {}) {
-  const { large = false, tag = null, showFavorite = true } = options;
+  const { large = false, tag = null, showFavorite = true, featured = false } = options;
   const playUrl = getPlayPageUrl(item);
   const imageSrc = gamePixImageUrl(item.banner_image || item.image, large ? 400 : 280);
   const category = formatCategory(item.category);
@@ -227,6 +227,7 @@ function createGameCard(item, options = {}) {
     article.dataset.quality = String(item.quality_score);
   }
   if (large) article.classList.add("game-card--large");
+  if (featured) article.classList.add("game-card--featured");
 
   const cardLink = document.createElement("a");
   cardLink.href = playUrl;
@@ -268,9 +269,10 @@ function createGameCard(item, options = {}) {
   }
 
   if (tag) {
+    const tagLabels = { hot: "Hot", new: "New", top: "Top" };
     const tagEl = document.createElement("span");
-    tagEl.className = `game-tag ${tag}`;
-    tagEl.textContent = tag === "hot" ? "Hot" : "New";
+    tagEl.className = "game-tag game-tag--" + tag;
+    tagEl.textContent = tagLabels[tag] || tag;
     cardLink.appendChild(tagEl);
   }
 
@@ -511,7 +513,31 @@ function createCategorySection(config, items) {
     loading: false,
   });
 
-  section.innerHTML = `
+  const isHub = document.body.classList.contains("home-crazy");
+
+  section.innerHTML = isHub
+    ? `
+    <div class="section-head section-head--hub">
+      <h2>${config.title}</h2>
+      <a href="#library" class="section-view-all">View all</a>
+      <span class="see-all section-count-inline" hidden>Showing ${initialCount} games</span>
+    </div>
+    <div class="game-row-wrap">
+      <button type="button" class="game-row-scroll game-row-scroll--prev" aria-label="Scroll left">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="game-grid game-grid--row game-grid--hub" data-grid></div>
+      <button type="button" class="game-row-scroll game-row-scroll--next" aria-label="Scroll right">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="load-more-wrap category-load-more-wrap">
+      <button type="button" class="btn btn-primary btn-load-more btn-load-more--category" data-category-slug="${config.slug}">
+        Load more games
+      </button>
+    </div>
+  `
+    : `
     <div class="section-head">
       <div>
         <h2>${config.title}</h2>
@@ -542,6 +568,10 @@ function createCategorySection(config, items) {
   }
 
   updateCategorySectionUi(config.slug);
+
+  if (isHub && typeof window.vixoInitGameRowScrollers === "function") {
+    window.vixoInitGameRowScrollers();
+  }
 
   return section;
 }
@@ -668,7 +698,11 @@ function applyHomepageEssentials(allPages) {
 
   const trending = allPages.slice(0, TRENDING_SHOW);
   renderGameCards(trendingGrid, trending, function (item, index) {
-    return { tag: index < 2 ? "hot" : null, large: false, showFavorite: true };
+    return {
+      tag: index === 0 ? "top" : index < 4 ? "hot" : null,
+      featured: index === 0,
+      showFavorite: true,
+    };
   });
   setSectionCount("count-trending", trending.length);
 

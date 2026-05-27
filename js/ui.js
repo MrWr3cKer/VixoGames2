@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initMainNav();
 
   const menuToggle = document.querySelector(".menu-toggle");
-  if (menuToggle) {
+  if (menuToggle && !document.body.classList.contains("home-crazy")) {
     menuToggle.addEventListener("click", function () {
       const open = document.body.classList.toggle("nav-open");
       this.setAttribute("aria-expanded", open);

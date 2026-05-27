@@ -1037,9 +1037,16 @@ main,
   color: white;
 }
 
-.game-tag.new {
+.game-tag.new,
+.game-tag--new {
   background: var(--accent-lime);
   color: #0c0a14;
+}
+
+.game-tag.top,
+.game-tag--top {
+  background: linear-gradient(90deg, #eab308, #f59e0b);
+  color: #1a1208;
 }
 
 /* Thumb gradients (placeholder art) */

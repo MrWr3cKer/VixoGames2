@@ -1,0 +1,498 @@
+/**
+ * CrazyGames-style hub layout — VixoGames fantasy theme
+ */
+
+.home-crazy {
+  --hub-sidebar-w: 232px;
+  --hub-row-card: 168px;
+  --hub-row-gap: 0.65rem;
+}
+
+/* Header: logo + wide search */
+.home-crazy .site-header {
+  gap: 1rem;
+  padding: 0 1.25rem;
+}
+
+.home-crazy .site-header .logo {
+  order: 1;
+}
+
+.home-crazy .site-header .header-actions {
+  order: 2;
+  flex: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.home-crazy .site-header .search-wrap {
+  width: 100%;
+}
+
+.home-crazy .site-header .search {
+  width: 100%;
+  max-width: none;
+  background: rgba(22, 18, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 0.55rem 1rem 0.55rem 2.75rem;
+}
+
+.home-crazy .site-header .search input {
+  font-size: 0.95rem;
+}
+
+.home-crazy .site-header .menu-toggle {
+  order: 3;
+  margin-left: 0;
+}
+
+/* Shell: sidebar + main */
+.hub-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  min-height: calc(100dvh - var(--header-h));
+  position: relative;
+  z-index: 1;
+}
+
+.hub-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  top: var(--header-h);
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 90;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.hub-sidebar {
+  flex: 0 0 var(--hub-sidebar-w);
+  width: var(--hub-sidebar-w);
+  position: sticky;
+  top: var(--header-h);
+  align-self: flex-start;
+  max-height: calc(100dvh - var(--header-h));
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 0.75rem 2rem;
+  background: rgba(10, 8, 18, 0.72);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  scrollbar-width: thin;
+}
+
+.hub-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-crazy .home-main {
+  max-width: none;
+  padding: 1rem 1.25rem 3rem;
+}
+
+/* Sidebar nav */
+.hub-sidebar-nav.main-nav {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.15rem;
+  padding: 0;
+  margin-bottom: 1.25rem;
+}
+
+.hub-sidebar-nav .nav-indicator {
+  display: none;
+}
+
+.hub-sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  color: var(--text-muted);
+}
+
+.hub-sidebar-nav .nav-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.hub-sidebar-nav .nav-link.active {
+  background: rgba(124, 58, 237, 0.28);
+  color: var(--text);
+  font-weight: 600;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.hub-sidebar-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.5rem 0.75rem 0.35rem;
+  margin: 0;
+}
+
+.hub-cat-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-bottom: 1rem;
+}
+
+.hub-cat-nav a {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.hub-cat-nav a:hover {
+  color: var(--accent-bright);
+  background: rgba(124, 58, 237, 0.12);
+}
+
+/* Compact welcome strip */
+.hub-welcome {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(30, 24, 56, 0.95), rgba(18, 14, 32, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.hub-welcome__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 0.35rem;
+}
+
+.hub-welcome h1 {
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 0.35rem;
+}
+
+.hub-welcome__desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 36rem;
+}
+
+.hub-welcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.hub-welcome__card {
+  width: min(200px, 28vw);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.35);
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+
+.hub-welcome__card .hero-thumb {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.hub-welcome__card .hero-card-play {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  padding: 0.25rem 0.6rem;
+}
+
+/* Quick filters — pill row */
+.home-crazy .quick-filters {
+  margin-bottom: 1.5rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.home-crazy .quick-filters__label {
+  display: none;
+}
+
+.home-crazy .categories-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+/* Section headers */
+.home-crazy .section-head--hub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.home-crazy .section-head--hub h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.home-crazy .section-head--hub .section-desc {
+  display: none;
+}
+
+.home-crazy .section-view-all {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-bright);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.home-crazy .section-view-all:hover {
+  color: var(--accent-cyan);
+}
+
+.home-crazy .section-count {
+  display: none;
+}
+
+/* Horizontal rows + scroll buttons */
+.game-row-wrap {
+  position: relative;
+  margin: 0 -0.25rem;
+}
+
+.game-row-wrap .game-grid--row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--hub-row-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: 0.25rem 2.5rem 0.75rem 0.25rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.game-row-wrap .game-grid--row::-webkit-scrollbar {
+  display: none;
+}
+
+.game-row-wrap .game-card {
+  flex: 0 0 var(--hub-row-card);
+  scroll-snap-align: start;
+}
+
+.game-row-wrap .game-card--featured {
+  flex: 0 0 min(320px, 42vw);
+}
+
+.game-row-wrap .game-card-link {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.game-row-wrap .game-card--featured .game-card-link {
+  aspect-ratio: 16 / 10;
+}
+
+.game-row-wrap .game-card h3 {
+  font-size: 0.82rem;
+  margin-top: 0.45rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-row-wrap .game-meta {
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
+
+.game-row-scroll {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-65%);
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 10, 20, 0.92);
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.game-row-scroll:hover {
+  background: rgba(124, 58, 237, 0.35);
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.game-row-scroll--prev {
+  left: 0;
+}
+
+.game-row-scroll--next {
+  right: 0;
+}
+
+/* Badges */
+/* Sections — lighter dividers */
+.home-crazy .game-section {
+  margin-bottom: 2rem;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.home-crazy .game-section--alt {
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.home-crazy .category-sections .game-section--category {
+  border-bottom: 0;
+  margin-bottom: 2rem;
+}
+
+.home-crazy .game-section--library {
+  padding: 1.25rem;
+  background: rgba(22, 18, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+}
+
+.home-crazy .home-stats--pro,
+.home-crazy .browse-categories,
+.home-crazy .hero--pro {
+  display: none !important;
+}
+
+/* Footer in hub main */
+.home-crazy .hub-main .site-footer {
+  margin-top: 2rem;
+  padding: 2rem 0 0;
+}
+
+/* Tablet / phone */
+@media (max-width: 1023px) {
+  .home-crazy {
+    --hub-sidebar-w: 260px;
+  }
+
+  .hub-sidebar {
+    position: fixed;
+    left: 0;
+    top: var(--header-h);
+    bottom: 0;
+    z-index: 95;
+    transform: translateX(-105%);
+    transition: transform 0.3s var(--ease);
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
+  }
+
+  body.hub-nav-open .hub-sidebar {
+    transform: translateX(0);
+  }
+
+  body.hub-nav-open .hub-sidebar-backdrop {
+    display: block;
+  }
+
+  .hub-shell {
+    display: block;
+  }
+
+  .home-crazy .site-header .header-actions {
+    max-width: none;
+    flex: 1;
+  }
+
+  .game-row-scroll {
+    display: none;
+  }
+
+  .game-row-wrap .game-grid--row {
+    padding-right: 0.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-crazy .site-header .header-actions,
+  .home-crazy .site-header .search-wrap {
+    display: flex !important;
+  }
+
+  .home-crazy .menu-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .hub-welcome {
+    grid-template-columns: 1fr;
+  }
+
+  .hub-welcome__card {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .home-crazy .home-main {
+    padding: 0.75rem 0.85rem 2.5rem;
+  }
+
+  .home-crazy {
+    --hub-row-card: 140px;
+  }
+}
+
+/* Desktop with ad rails — sidebar stays inside center column */
+@media (min-width: 1024px) {
+  body.home-crazy.has-ad-rail .hub-sidebar {
+    top: var(--effective-header-h);
+    max-height: calc(100dvh - var(--effective-header-h));
+  }
+
+  .home-crazy .menu-toggle {
+    display: none;
+  }
+
+  .home-crazy .site-header .header-actions {
+    display: flex;
+  }
+}
