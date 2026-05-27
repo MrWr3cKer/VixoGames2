@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Kontakt VixoGames — rapporter bugs, foreslå spill eller ta kontakt for samarbeid." />
-  <title>Kontakt – VixoGames</title>
+  <meta name="description" content="Contact VixoGames — report bugs, suggest games, or reach out about partnerships." />
+  <title>Contact – VixoGames</title>
   <link rel="icon" href="logo/logo.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=8" />
@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
   <link rel="stylesheet" href="css/ads.css?v=24" />
   <link rel="stylesheet" href="css/thumb-bg.css?v=12" />
-  <link rel="stylesheet" href="css/contact.css?v=1" />
+  <link rel="stylesheet" href="css/contact.css?v=2" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
 <body class="has-ad-rail has-thumb-bg">
@@ -23,7 +23,7 @@
     <a href="index.html" class="logo">
       <img src="logo/logo.png" alt="VixoGames" class="logo-img" width="180" height="52" />
     </a>
-    <a href="index.html" class="btn btn-ghost">← Tilbake til spill</a>
+    <a href="index.html" class="btn btn-ghost">← Back to games</a>
   </header>
 
   <div class="site-body">
@@ -35,65 +35,64 @@
 
     <div class="page-content">
       <main class="static-page contact-page">
-        <h1>Kontakt oss</h1>
+        <h1>Contact us</h1>
         <p class="static-lead">
-          Har du funnet en bug, et spillforslag eller vil du samarbeide? Send oss en melding — vi svarer så fort vi kan.
+          Found a bug, have a game suggestion, or want to collaborate? Send us a message — we’ll reply as soon as we can.
         </p>
 
         <form id="contact-form" class="contact-form" novalidate>
           <div class="contact-field">
-            <label for="contact-category">Kategori</label>
+            <label for="contact-category">Category</label>
             <select id="contact-category" name="category" required>
-              <option value="">Velg kategori…</option>
-              <option value="bug">Rapporter en bug</option>
-              <option value="game">Forslag til spill</option>
-              <option value="partnership">Samarbeid</option>
-              <option value="other">Annet</option>
+              <option value="">Choose category…</option>
+              <option value="bug">Report a bug</option>
+              <option value="game">Game suggestion</option>
+              <option value="partnership">Partnership</option>
+              <option value="other">Other</option>
             </select>
           </div>
 
           <div class="contact-field">
-            <label for="contact-title">Overskrift</label>
+            <label for="contact-title">Subject</label>
             <input
               type="text"
               id="contact-title"
               name="title"
               required
               maxlength="120"
-              placeholder="Kort oppsummering"
+              placeholder="Short summary"
               autocomplete="off"
             />
           </div>
 
           <div class="contact-field">
-            <label for="contact-message">Melding</label>
+            <label for="contact-message">Message</label>
             <textarea
               id="contact-message"
               name="message"
               required
               maxlength="2000"
               rows="6"
-              placeholder="Beskriv buggen, forslaget eller henvendelsen din…"
+              placeholder="Describe the bug, your suggestion, or inquiry…"
             ></textarea>
           </div>
 
           <div class="contact-field">
-            <label for="contact-info">Kontaktinfo</label>
+            <label for="contact-info">Contact info</label>
             <input
               type="text"
               id="contact-info"
               name="contact"
               required
               maxlength="200"
-              placeholder="Discord-brukernavn eller e-post"
+              placeholder="Discord username or email"
               autocomplete="email"
             />
-            <p class="contact-hint">Vi bruker dette kun for å svare deg.</p>
+            <p class="contact-hint">We only use this to reply to you.</p>
           </div>
 
-          <!-- Honeypot — skjult for bots -->
           <div class="contact-honeypot" aria-hidden="true">
-            <label for="contact-website">Nettsted</label>
+            <label for="contact-website">Website</label>
             <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
           </div>
 
@@ -110,9 +109,9 @@
       <footer class="site-footer site-footer--static">
         <p class="footer-copy">
           © 2026 VixoGames ·
-          <a href="about.html">Om oss</a> ·
-          <a href="privacy.html">Personvern</a> ·
-          <a href="index.html">Hjem</a>
+          <a href="about.html">About</a> ·
+          <a href="privacy.html">Privacy</a> ·
+          <a href="index.html">Home</a>
         </p>
       </footer>
     </div>
@@ -126,6 +125,6 @@
 
   <script src="js/ad-slot.js?v=11" defer></script>
   <script src="js/thumb-bg.js?v=11" defer></script>
-  <script src="js/contact.js?v=1" defer></script>
+  <script src="js/contact.js?v=3" defer></script>
 </body>
 </html>

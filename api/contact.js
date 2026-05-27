@@ -4,10 +4,10 @@
  */
 
 const CATEGORY_LABELS = {
-  bug: "Rapporter en bug",
-  game: "Forslag til spill",
-  partnership: "Samarbeid",
-  other: "Annet",
+  bug: "Report a bug",
+  game: "Game suggestion",
+  partnership: "Partnership",
+  other: "Other",
 };
 
 const CATEGORY_COLORS = {
@@ -125,36 +125,36 @@ module.exports = async function handler(req, res) {
   const contact = cleanString(body.contact, LIMITS.contact);
 
   if (!isValidCategory(category)) {
-    json(res, 400, { success: false, error: "Velg en gyldig kategori." });
+    json(res, 400, { success: false, error: "Please choose a valid category." });
     return;
   }
   if (!title || title.length < 2) {
-    json(res, 400, { success: false, error: "Overskrift er for kort." });
+    json(res, 400, { success: false, error: "Subject is too short." });
     return;
   }
   if (!message || message.length < 10) {
-    json(res, 400, { success: false, error: "Meldingen må være minst 10 tegn." });
+    json(res, 400, { success: false, error: "Message must be at least 10 characters." });
     return;
   }
   if (!contact || contact.length < 3) {
-    json(res, 400, { success: false, error: "Oppgi Discord eller e-post." });
+    json(res, 400, { success: false, error: "Please provide Discord or email." });
     return;
   }
 
   const categoryLabel = CATEGORY_LABELS[category];
   const color = CATEGORY_COLORS[category] || CATEGORY_COLORS.other;
-  const contactType = looksLikeEmail(contact) ? "E-post" : "Discord / annet";
+  const contactType = looksLikeEmail(contact) ? "Email" : "Discord / other";
 
   const embed = {
     title: title.slice(0, 256),
     description: message.length > 4096 ? message.slice(0, 4093) + "…" : message,
     color: color,
     fields: [
-      { name: "Kategori", value: categoryLabel, inline: true },
-      { name: "Kontakt", value: contact, inline: true },
+      { name: "Category", value: categoryLabel, inline: true },
+      { name: "Contact", value: contact, inline: true },
       { name: "Type", value: contactType, inline: true },
     ],
-    footer: { text: "VixoGames · kontaktskjema" },
+    footer: { text: "VixoGames · contact form" },
     timestamp: new Date().toISOString(),
   };
 
@@ -163,20 +163,20 @@ module.exports = async function handler(req, res) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: "VixoGames Kontakt",
+        username: "VixoGames Contact",
         embeds: [embed],
       }),
     });
 
     if (!discordRes.ok) {
       console.error("Discord webhook failed:", discordRes.status, await discordRes.text());
-      json(res, 502, { success: false, error: "Kunne ikke levere meldingen." });
+      json(res, 502, { success: false, error: "Could not deliver your message." });
       return;
     }
 
     json(res, 200, { success: true });
   } catch (err) {
     console.error("Discord webhook error:", err);
-    json(res, 502, { success: false, error: "Kunne ikke levere meldingen." });
+    json(res, 502, { success: false, error: "Could not deliver your message." });
   }
 };
