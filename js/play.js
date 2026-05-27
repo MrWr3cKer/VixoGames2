@@ -87,12 +87,13 @@ function applyGameStageSize(stage, params) {
   const orientation = (params.get("orientation") || "").toLowerCase();
 
   let aspect = "16 / 9";
-  let maxWidth = "min(100%, 1040px)";
+  const wideDesktop = window.matchMedia("(min-width: 1024px)").matches;
+  let maxWidth = wideDesktop ? "100%" : "min(100%, 1040px)";
 
   if (w > 0 && h > 0) {
     aspect = `${w} / ${h}`;
     if (w >= h) {
-      maxWidth = "min(100%, 1040px)";
+      maxWidth = wideDesktop ? "100%" : "min(100%, 1040px)";
       stage.classList.add("game-stage--landscape");
       stage.classList.remove("game-stage--portrait");
     } else {
@@ -113,12 +114,12 @@ function applyGameStageSize(stage, params) {
     stage.classList.remove("game-stage--landscape");
   } else if (orientation === "landscape") {
     aspect = "4 / 3";
-    maxWidth = "min(100%, 1040px)";
+    maxWidth = wideDesktop ? "100%" : "min(100%, 1040px)";
     stage.classList.add("game-stage--landscape");
     stage.classList.remove("game-stage--portrait");
   } else {
     aspect = "16 / 9";
-    maxWidth = "min(100%, 1040px)";
+    maxWidth = wideDesktop ? "100%" : "min(100%, 1040px)";
     stage.classList.add("game-stage--landscape");
     stage.classList.remove("game-stage--portrait");
   }
@@ -428,6 +429,7 @@ function initGameFocus() {
 function initFullscreen() {
   const btn = document.getElementById("btn-fullscreen");
   const stage = document.getElementById("game-stage");
+  const iframe = document.getElementById("game-frame");
   const shell = stage?.closest(".play-stage-shell");
   const fsTarget = shell || stage;
   const iconEnter = btn?.querySelector(".icon-fs-enter");
@@ -436,78 +438,205 @@ function initFullscreen() {
 
   if (!btn || !stage || !fsTarget) return;
 
+  let fsScrollLockY = 0;
+  let fsViewportBound = false;
+
+  function isCoarseMobile() {
+    return (
+      window.matchMedia("(max-width: 768px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    );
+  }
+
   function isNativeFullscreen() {
     const el =
       document.fullscreenElement ||
       document.webkitFullscreenElement;
-    return el === stage || el === fsTarget;
+    return (
+      el === stage ||
+      el === fsTarget ||
+      el === iframe ||
+      (el && (el === stage || fsTarget.contains(el)))
+    );
   }
 
-  function isFallbackFullscreen() {
+  function isMobileFullscreen() {
+    return document.body.classList.contains("vixo-mobile-fs");
+  }
+
+  function isDesktopFallback() {
     return fsTarget.classList.contains("is-fullscreen-fallback");
   }
 
   function isFullscreenActive() {
-    return isNativeFullscreen() || isFallbackFullscreen();
+    return (
+      isNativeFullscreen() || isMobileFullscreen() || isDesktopFallback()
+    );
   }
 
-  function setFallbackFullscreen(on) {
+  function updateFsViewportHeight() {
+    const h = window.visualViewport
+      ? window.visualViewport.height
+      : window.innerHeight;
+    document.documentElement.style.setProperty(
+      "--vixo-fs-h",
+      Math.round(h) + "px"
+    );
+  }
+
+  function bindFsViewport() {
+    if (fsViewportBound || !window.visualViewport) return;
+    fsViewportBound = true;
+    window.visualViewport.addEventListener("resize", updateFsViewportHeight);
+    window.visualViewport.addEventListener("scroll", updateFsViewportHeight);
+  }
+
+  function unbindFsViewport() {
+    if (!fsViewportBound || !window.visualViewport) return;
+    fsViewportBound = false;
+    window.visualViewport.removeEventListener("resize", updateFsViewportHeight);
+    window.visualViewport.removeEventListener("scroll", updateFsViewportHeight);
+    document.documentElement.style.removeProperty("--vixo-fs-h");
+  }
+
+  function lockPageForFs() {
+    fsScrollLockY = window.scrollY || window.pageYOffset || 0;
+    document.body.style.position = "fixed";
+    document.body.style.top = "-" + fsScrollLockY + "px";
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+  }
+
+  function unlockPageForFs() {
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    window.scrollTo(0, fsScrollLockY);
+  }
+
+  function setMobileFullscreen(on) {
+    document.documentElement.classList.toggle("vixo-mobile-fs", on);
+    document.body.classList.toggle("vixo-mobile-fs", on);
+    const floater = document.getElementById("vixo-fs-exit");
+    if (floater) floater.hidden = !on;
+    if (on) {
+      lockPageForFs();
+      updateFsViewportHeight();
+      bindFsViewport();
+      window.setTimeout(focusGameFrame, 50);
+    } else {
+      unlockPageForFs();
+      unbindFsViewport();
+    }
+  }
+
+  function setDesktopFallback(on) {
     fsTarget.classList.toggle("is-fullscreen-fallback", on);
     stage.classList.toggle("is-fullscreen-fallback", on && fsTarget !== stage);
     document.documentElement.classList.toggle("vixo-fs-active", on);
     document.body.classList.toggle("vixo-fs-active", on);
+    if (on) {
+      lockPageForFs();
+    } else {
+      unlockPageForFs();
+    }
   }
 
   function syncFullscreenUi() {
     const active = isFullscreenActive();
     if (iconEnter) iconEnter.classList.toggle("is-hidden", active);
     if (iconExit) iconExit.classList.toggle("is-hidden", !active);
-    if (label) label.textContent = active ? "Exit" : "Fullscreen";
+    if (label) {
+      label.textContent = active ? "Exit" : "Fullscreen";
+    }
     btn.setAttribute("aria-label", active ? "Exit fullscreen" : "Fullscreen");
     stage.classList.toggle("is-fullscreen", isNativeFullscreen());
-    if (isNativeFullscreen()) {
-      fsTarget.classList.remove("is-fullscreen-fallback");
-      stage.classList.remove("is-fullscreen-fallback");
-      document.documentElement.classList.remove("vixo-fs-active");
-      document.body.classList.remove("vixo-fs-active");
-    } else if (!isFallbackFullscreen()) {
-      setFallbackFullscreen(false);
-    }
   }
 
-  function requestNativeFullscreen() {
+  function requestNativeFullscreen(el) {
+    const target = el || fsTarget;
     const req =
-      fsTarget.requestFullscreen ||
-      fsTarget.webkitRequestFullscreen;
+      target.requestFullscreen ||
+      target.webkitRequestFullscreen ||
+      target.mozRequestFullScreen ||
+      target.msRequestFullscreen;
     if (!req) return Promise.reject(new Error("Fullscreen API unavailable"));
-    return Promise.resolve(req.call(fsTarget));
+    return Promise.resolve(req.call(target));
   }
 
   function exitNativeFullscreen() {
     const exit =
       document.exitFullscreen ||
-      document.webkitExitFullscreen;
+      document.webkitExitFullscreen ||
+      document.mozCancelFullScreen ||
+      document.msExitFullscreen;
     if (exit) return Promise.resolve(exit.call(document));
     return Promise.resolve();
   }
 
-  function toggleFullscreen() {
-    if (isFallbackFullscreen()) {
-      setFallbackFullscreen(false);
+  function enterFullscreen() {
+    if (isCoarseMobile()) {
+      setMobileFullscreen(true);
       syncFullscreenUi();
       return;
     }
-    if (isNativeFullscreen()) {
-      exitNativeFullscreen().then(syncFullscreenUi).catch(syncFullscreenUi);
-      return;
-    }
-    requestNativeFullscreen()
+
+    requestNativeFullscreen(fsTarget)
       .then(syncFullscreenUi)
       .catch(function () {
-        setFallbackFullscreen(true);
+        if (iframe) {
+          return requestNativeFullscreen(iframe);
+        }
+        return Promise.reject();
+      })
+      .then(syncFullscreenUi)
+      .catch(function () {
+        setDesktopFallback(true);
         syncFullscreenUi();
         window.setTimeout(focusGameFrame, 80);
       });
+  }
+
+  function exitFullscreen() {
+    if (isMobileFullscreen()) {
+      setMobileFullscreen(false);
+      syncFullscreenUi();
+      return;
+    }
+    if (isDesktopFallback()) {
+      setDesktopFallback(false);
+      syncFullscreenUi();
+      return;
+    }
+    exitNativeFullscreen().then(syncFullscreenUi).catch(syncFullscreenUi);
+  }
+
+  function toggleFullscreen() {
+    if (isFullscreenActive()) {
+      exitFullscreen();
+    } else {
+      enterFullscreen();
+    }
+  }
+
+  let floater = document.getElementById("vixo-fs-exit");
+  if (!floater && isCoarseMobile()) {
+    floater = document.createElement("button");
+    floater.type = "button";
+    floater.id = "vixo-fs-exit";
+    floater.className = "vixo-fs-exit";
+    floater.hidden = true;
+    floater.setAttribute("aria-label", "Exit fullscreen");
+    floater.textContent = "Done";
+    document.body.appendChild(floater);
+    floater.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      exitFullscreen();
+    });
   }
 
   btn.addEventListener("click", function (e) {
@@ -518,6 +647,13 @@ function initFullscreen() {
 
   document.addEventListener("fullscreenchange", syncFullscreenUi);
   document.addEventListener("webkitfullscreenchange", syncFullscreenUi);
+
+  window.addEventListener("orientationchange", function () {
+    if (isMobileFullscreen()) {
+      window.setTimeout(updateFsViewportHeight, 120);
+    }
+  });
+
   syncFullscreenUi();
 }
 

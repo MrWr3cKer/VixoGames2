@@ -116,6 +116,19 @@
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }
+
+  /* Play page: one skyscraper + wide game (avoid narrow center + asymmetric right rail) */
+  body.play-page.has-ad-rail .site-body {
+    grid-template-columns: var(--ad-rail-w) minmax(0, 1fr);
+  }
+
+  body.play-page.has-ad-rail .ad-rail--right {
+    display: none;
+  }
+
+  body.play-page.has-ad-rail .site-body {
+    background: var(--bg-deep);
+  }
 }
 
 /* Medium desktop: left banner only (not enough room for both) */

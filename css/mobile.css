@@ -838,6 +838,133 @@ html.vixo-mobile .game-thumb-bg:not(.is-ready) {
   }
 }
 
+/* ─── Play page: true mobile fullscreen (iOS / touch) ─── */
+@media (max-width: 768px) {
+  html.vixo-mobile-fs,
+  body.play-page.vixo-mobile-fs {
+    overflow: hidden !important;
+    height: 100% !important;
+    background: #000 !important;
+  }
+
+  body.vixo-mobile-fs .play-header,
+  body.vixo-mobile-fs .play-sidebar,
+  body.vixo-mobile-fs .play-similar-mobile,
+  body.vixo-mobile-fs .play-game-desc,
+  body.vixo-mobile-fs .ad-rail,
+  body.vixo-mobile-fs .game-thumb-bg,
+  body.vixo-mobile-fs .bg-glow,
+  body.vixo-mobile-fs #magic-ripples {
+    display: none !important;
+  }
+
+  body.vixo-mobile-fs .site-body,
+  body.vixo-mobile-fs .page-content,
+  body.vixo-mobile-fs .play-layout,
+  body.vixo-mobile-fs .play-center {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+
+  body.vixo-mobile-fs .play-stage-shell {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100000 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: var(--vixo-fs-h, 100dvh) !important;
+    min-height: var(--vixo-fs-h, 100dvh) !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #000 !important;
+    overflow: hidden;
+  }
+
+  body.vixo-mobile-fs .play-toolbar {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 3;
+    margin: 0;
+    padding: max(0.4rem, env(safe-area-inset-top))
+      max(0.5rem, env(safe-area-inset-right)) 0.35rem
+      max(0.5rem, env(safe-area-inset-left));
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.88), transparent);
+    border: none;
+    justify-content: flex-end;
+  }
+
+  body.vixo-mobile-fs .toolbar-btn--primary {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.5rem 0.9rem;
+  }
+
+  body.vixo-mobile-fs .game-stage {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    aspect-ratio: unset !important;
+    margin: 0 !important;
+    background: #000;
+  }
+
+  body.vixo-mobile-fs .game-stage-inner {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+  }
+
+  body.vixo-mobile-fs .game-stage iframe {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100%;
+    border: 0;
+    background: #000;
+  }
+
+  body.vixo-mobile-fs .play-loading-bar,
+  body.vixo-mobile-fs .game-stage-loading:not(.is-hidden) {
+    z-index: 2;
+  }
+}
+
+.vixo-fs-exit {
+  display: none;
+  position: fixed;
+  z-index: 100001;
+  top: max(0.45rem, env(safe-area-inset-top));
+  right: max(0.45rem, env(safe-area-inset-right));
+  left: auto;
+  bottom: auto;
+  transform: none;
+  min-height: 44px;
+  padding: 0.55rem 1.35rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(124, 58, 237, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  touch-action: manipulation;
+}
+
+body.vixo-mobile-fs .vixo-fs-exit {
+  display: block;
+}
+
 /* Extra savings on slow / save-data connections */
 html.vixo-save-data .home-crazy .category-sections .is-category-lazy {
   min-height: 120px;

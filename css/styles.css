@@ -1433,7 +1433,7 @@ main,
   display: block;
 }
 
-/* Single-column play layout: game on top, recommendations full width below */
+/* Play layout — stacked on phone/tablet; game + side recs on desktop */
 .play-layout {
   position: relative;
   z-index: 1;
@@ -1443,7 +1443,7 @@ main,
   align-items: stretch;
   gap: 1.75rem;
   padding: 1.25rem 1.5rem 2.5rem;
-  max-width: min(1280px, 100%);
+  max-width: min(1680px, 100%);
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
@@ -1452,10 +1452,9 @@ main,
 .play-center {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   min-width: 0;
   width: 100%;
-  order: 1;
 }
 
 .play-stage-shell {
@@ -1632,11 +1631,6 @@ html.vixo-fs-active body {
   width: 100%;
   max-height: none;
   overflow: visible;
-  order: 2;
-}
-
-.play-sidebar--right {
-  order: 3;
 }
 
 .play-sidebar .similar-list,
@@ -1766,9 +1760,34 @@ html.vixo-fs-active body {
 
 @media (max-width: 1023px) {
   .play-layout {
+    display: flex;
+    flex-direction: column;
     padding: 1rem max(1rem, env(safe-area-inset-right)) 2rem
       max(1rem, env(safe-area-inset-left));
     gap: 1.35rem;
+  }
+
+  /* DOM has sidebar before game — force game first on phone/tablet */
+  .play-center {
+    order: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .play-sidebar:not(.play-sidebar--right) {
+    order: 2;
+    width: 100%;
+    max-width: none;
+  }
+
+  .play-center .play-stage-shell {
+    order: 1;
+  }
+
+  .play-center .play-game-desc:not(.is-hidden) {
+    order: 2;
+    margin-top: 0.85rem;
   }
 
   .play-sidebar--right {
@@ -1776,26 +1795,145 @@ html.vixo-fs-active body {
   }
 
   .play-sidebar .similar-list {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 0.65rem;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    grid-template-columns: unset !important;
+    gap: 0.5rem !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.35rem;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .play-sidebar .similar-card {
+    flex: 0 0 108px;
+    width: 108px;
+    scroll-snap-align: start;
+  }
+
+  .play-sidebar .similar-card-cover {
+    aspect-ratio: 1;
+  }
+
+  .play-sidebar .similar-card-body {
+    padding: 0.4rem 0.45rem 0.5rem;
+  }
+
+  .play-sidebar .similar-card-title {
+    font-size: 0.68rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .play-sidebar .similar-card-meta {
+    font-size: 0.58rem;
   }
 }
 
+/* Desktop: wide game stage + sticky recommendation column (CrazyGames-style) */
 @media (min-width: 1024px) {
-  .play-page .play-stage-shell {
-    max-width: min(100%, var(--game-max-width, 1040px));
-    margin-left: auto;
-    margin-right: auto;
+  .play-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "play-game play-side-r"
+      "play-side-l play-side-r";
+    gap: 1.25rem 1.5rem;
+    max-width: none;
+    width: 100%;
+    align-items: start;
+    padding: 1.25rem 1rem 2.5rem;
+  }
+
+  .play-center {
+    grid-area: play-game;
+    align-items: stretch;
+  }
+
+  .play-stage-shell {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .play-page .play-layout:has(.game-stage--portrait) .play-stage-shell {
     max-width: min(100%, 560px);
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .play-page .play-sidebar,
-  .play-page .play-sidebar--right {
+  .play-sidebar {
+    grid-area: play-side-l;
     padding-top: 1.25rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .play-sidebar .similar-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .play-sidebar--right {
+    display: block;
+    grid-area: play-side-r;
+    position: sticky;
+    top: calc(var(--header-h, 72px) + 0.75rem);
+    max-height: calc(100dvh - var(--header-h, 72px) - 1.5rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .play-sidebar--right .similar-list {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
+    gap: 0.65rem;
+  }
+
+  .play-game-desc {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* No site ad rails: three-column play grid (sidebars flank the game) */
+@media (min-width: 1024px) {
+  .play-page:not(.has-ad-rail) .play-layout {
+    grid-template-columns: minmax(200px, 260px) minmax(0, 1fr) minmax(200px, 260px);
+    grid-template-rows: auto;
+    grid-template-areas: none;
+  }
+
+  .play-page:not(.has-ad-rail) .play-center,
+  .play-page:not(.has-ad-rail) .play-sidebar,
+  .play-page:not(.has-ad-rail) .play-sidebar--right {
+    grid-area: auto;
+  }
+
+  .play-page:not(.has-ad-rail) .play-sidebar {
+    position: sticky;
+    top: calc(var(--header-h, 72px) + 0.75rem);
+    max-height: calc(100dvh - var(--header-h, 72px) - 1.5rem);
+    overflow-y: auto;
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .play-page:not(.has-ad-rail) .play-sidebar .similar-list {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
   }
 }
 
