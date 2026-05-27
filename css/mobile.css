@@ -209,7 +209,8 @@ body {
   }
 
   body.home-crazy::before,
-  body.has-thumb-bg::before {
+  body.has-thumb-bg::before,
+  body.has-thumb-bg.play-page::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -301,6 +302,22 @@ body {
 
   .hub-welcome__card.is-hero-active {
     transition: none;
+  }
+
+  body.has-thumb-bg.play-page {
+    background: #0c0818;
+  }
+
+  body.has-thumb-bg.play-page .play-sidebar,
+  body.has-thumb-bg.play-page .play-similar-mobile {
+    background: rgba(14, 10, 26, 0.96) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  body.has-thumb-bg.play-page .similar-list--grid,
+  body.has-thumb-bg.play-page .play-sidebar .similar-list {
+    background: transparent;
   }
 }
 

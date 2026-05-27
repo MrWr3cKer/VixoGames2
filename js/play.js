@@ -383,9 +383,12 @@ function initGameFocus() {
 
   if (toolbar) {
     toolbar.addEventListener("mousedown", function (e) {
+      /* preventDefault on mousedown blocks the click event on iOS Safari */
+      if (e.target.closest("button, a")) return;
       e.preventDefault();
     });
-    toolbar.addEventListener("mouseup", function () {
+    toolbar.addEventListener("mouseup", function (e) {
+      if (e.target.closest("#btn-fullscreen")) return;
       focusGameFrame();
     });
   }
@@ -419,32 +422,96 @@ function initGameFocus() {
 function initFullscreen() {
   const btn = document.getElementById("btn-fullscreen");
   const stage = document.getElementById("game-stage");
+  const shell = stage?.closest(".play-stage-shell");
+  const fsTarget = shell || stage;
   const iconEnter = btn?.querySelector(".icon-fs-enter");
   const iconExit = btn?.querySelector(".icon-fs-exit");
   const label = btn?.querySelector(".toolbar-btn-label");
 
-  if (!btn || !stage) return;
+  if (!btn || !stage || !fsTarget) return;
+
+  function isNativeFullscreen() {
+    const el =
+      document.fullscreenElement ||
+      document.webkitFullscreenElement;
+    return el === stage || el === fsTarget;
+  }
+
+  function isFallbackFullscreen() {
+    return fsTarget.classList.contains("is-fullscreen-fallback");
+  }
+
+  function isFullscreenActive() {
+    return isNativeFullscreen() || isFallbackFullscreen();
+  }
+
+  function setFallbackFullscreen(on) {
+    fsTarget.classList.toggle("is-fullscreen-fallback", on);
+    stage.classList.toggle("is-fullscreen-fallback", on && fsTarget !== stage);
+    document.documentElement.classList.toggle("vixo-fs-active", on);
+    document.body.classList.toggle("vixo-fs-active", on);
+  }
 
   function syncFullscreenUi() {
-    const active = document.fullscreenElement === stage;
+    const active = isFullscreenActive();
     if (iconEnter) iconEnter.classList.toggle("is-hidden", active);
     if (iconExit) iconExit.classList.toggle("is-hidden", !active);
     if (label) label.textContent = active ? "Exit" : "Fullscreen";
     btn.setAttribute("aria-label", active ? "Exit fullscreen" : "Fullscreen");
-    stage.classList.toggle("is-fullscreen", active);
+    stage.classList.toggle("is-fullscreen", isNativeFullscreen());
+    if (isNativeFullscreen()) {
+      fsTarget.classList.remove("is-fullscreen-fallback");
+      stage.classList.remove("is-fullscreen-fallback");
+      document.documentElement.classList.remove("vixo-fs-active");
+      document.body.classList.remove("vixo-fs-active");
+    } else if (!isFallbackFullscreen()) {
+      setFallbackFullscreen(false);
+    }
   }
 
-  btn.addEventListener("click", function () {
-    if (document.fullscreenElement === stage) {
-      document.exitFullscreen();
-    } else {
-      stage.requestFullscreen().catch(function () {
-        stage.classList.toggle("is-fullscreen-fallback");
-      });
+  function requestNativeFullscreen() {
+    const req =
+      fsTarget.requestFullscreen ||
+      fsTarget.webkitRequestFullscreen;
+    if (!req) return Promise.reject(new Error("Fullscreen API unavailable"));
+    return Promise.resolve(req.call(fsTarget));
+  }
+
+  function exitNativeFullscreen() {
+    const exit =
+      document.exitFullscreen ||
+      document.webkitExitFullscreen;
+    if (exit) return Promise.resolve(exit.call(document));
+    return Promise.resolve();
+  }
+
+  function toggleFullscreen() {
+    if (isFallbackFullscreen()) {
+      setFallbackFullscreen(false);
+      syncFullscreenUi();
+      return;
     }
+    if (isNativeFullscreen()) {
+      exitNativeFullscreen().then(syncFullscreenUi).catch(syncFullscreenUi);
+      return;
+    }
+    requestNativeFullscreen()
+      .then(syncFullscreenUi)
+      .catch(function () {
+        setFallbackFullscreen(true);
+        syncFullscreenUi();
+        window.setTimeout(focusGameFrame, 80);
+      });
+  }
+
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFullscreen();
   });
 
   document.addEventListener("fullscreenchange", syncFullscreenUi);
+  document.addEventListener("webkitfullscreenchange", syncFullscreenUi);
   syncFullscreenUi();
 }
 

@@ -31,6 +31,7 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--bg-deep);
 }
 
 body {
@@ -1543,19 +1544,48 @@ main,
   aspect-ratio: unset;
 }
 
+.play-stage-shell.is-fullscreen-fallback,
 .game-stage.is-fullscreen-fallback {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 20000;
   width: 100vw !important;
   max-width: none !important;
+  height: 100dvh;
   height: 100vh;
   aspect-ratio: unset;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+}
+
+.play-stage-shell.is-fullscreen-fallback .game-stage {
+  flex: 1;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: unset;
+}
+
+.play-stage-shell.is-fullscreen-fallback {
+  display: flex;
+  flex-direction: column;
+}
+
+html.vixo-fs-active,
+html.vixo-fs-active body {
+  overflow: hidden;
+  height: 100%;
 }
 
 .game-stage-inner {
   position: absolute;
   inset: 0;
+  background: var(--bg-deep);
 }
 
 .game-stage iframe {
@@ -1563,7 +1593,7 @@ main,
   height: 100%;
   border: 0;
   display: block;
-  background: #000;
+  background: var(--bg-deep);
 }
 
 .game-stage-loading {

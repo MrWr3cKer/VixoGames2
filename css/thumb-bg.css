@@ -145,9 +145,9 @@ body.home-crazy .site-header {
   background: rgba(22, 18, 42, 0.28) !important;
 }
 
-/* Play page — same drifting thumb background as homepage */
+/* Play page — thumb layer on top; keep body dark so gaps never flash white */
 body.has-thumb-bg.play-page {
-  background: transparent;
+  background: var(--bg-deep);
 }
 
 body.has-thumb-bg.play-page .bg-glow {
@@ -172,12 +172,16 @@ body.has-thumb-bg.play-page .play-header {
 
 body.has-thumb-bg.play-page .play-sidebar,
 body.has-thumb-bg.play-page .play-similar-mobile {
-  background: rgba(22, 18, 42, 0.3);
+  background: rgba(14, 10, 26, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 14px;
   padding: 0.65rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+body.has-thumb-bg.play-page .play-layout {
+  background: transparent;
 }
 
 body.has-thumb-bg.play-page .similar-card {
