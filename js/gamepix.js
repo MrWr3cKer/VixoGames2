@@ -13,14 +13,14 @@ const FETCH_TIMEOUT_MS = 25000;
 const INITIAL_MAIN_PAGES = 4;
 const QUICK_LOAD_PAGES = 2;
 /** Per category row on homepage */
-const CATEGORY_PAGES_EACH = 1;
+const CATEGORY_PAGES_EACH = 2;
 const CATEGORY_BATCH_SIZE = 3;
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
 const TRENDING_SHOW = 16;
 const NEW_SHOW = 14;
-const CATEGORY_INITIAL_SHOW = 10;
-const CATEGORY_LOAD_STEP = 10;
+const CATEGORY_INITIAL_SHOW = 14;
+const CATEGORY_LOAD_STEP = 12;
 const INITIAL_ALL_SHOW = 32;
 
 const categorySectionState = new Map();

@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="css/kid-animations.css?v=2" />
   <link rel="stylesheet" href="css/ads.css?v=24" />
   <link rel="stylesheet" href="css/home-pro.css?v=2" />
-  <link rel="stylesheet" href="css/crazy-hub.css?v=6" />
+  <link rel="stylesheet" href="css/crazy-hub.css?v=7" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
 <body class="has-ad-rail home-crazy">
@@ -77,8 +77,10 @@
       </div>
     </div>
 
-    <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
+    <button type="button" class="menu-toggle menu-toggle--hub" aria-label="Open menu" aria-expanded="false" title="Menu">
+      <span class="menu-toggle__bar" aria-hidden="true"></span>
+      <span class="menu-toggle__bar" aria-hidden="true"></span>
+      <span class="menu-toggle__bar" aria-hidden="true"></span>
     </button>
   </header>
 
@@ -246,7 +248,7 @@
       <div class="section-head section-head--stack">
         <div>
           <h2>Full game library</h2>
-          <p class="section-desc">Search, sort and load more — the complete catalog lives here</p>
+          <p class="section-desc">Search and sort the complete catalog</p>
         </div>
         <div class="library-controls" aria-label="Sort and filter library">
           <label class="library-control">
@@ -277,11 +279,6 @@
         <span class="section-count" id="count-all"></span>
       </div>
       <div class="game-grid game-grid--dense game-grid--catalog" id="gamepix-all" aria-live="polite"></div>
-      <div class="load-more-wrap">
-        <button type="button" class="btn btn-primary btn-load-more" id="load-more" hidden>
-          Load more games
-        </button>
-      </div>
     </section>
   </main>
 
@@ -338,11 +335,11 @@
   <script src="js/routes.js?v=4" defer></script>
   <script src="js/storage.js?v=3" defer></script>
   <script src="js/ui.js?v=9" defer></script>
-  <script src="js/gamepix.js?v=15" defer></script>
+  <script src="js/gamepix.js?v=16" defer></script>
   <script src="js/ad-slot.js?v=11" defer></script>
   <script src="js/magic-bg.js?v=2" defer></script>
   <script src="js/animations.js?v=4" defer></script>
   <script src="js/home.js?v=2" defer></script>
-  <script src="js/home-hub.js?v=3" defer></script>
+  <script src="js/home-hub.js?v=5" defer></script>
 </body>
 </html>

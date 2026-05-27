@@ -4,6 +4,19 @@
 document.addEventListener("DOMContentLoaded", function () {
   if (!document.body.classList.contains("home-crazy")) return;
 
+  // Always open homepage from the top; avoid anchor/hash auto-jumps.
+  if (window.history && "scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
+  if (window.location.hash) {
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + window.location.search
+    );
+  }
+  window.scrollTo(0, 0);
+
   populateHubCategories();
   initHubSidebar();
   initGameRowScrollers();
@@ -11,7 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function populateHubCategories() {
   var nav = document.getElementById("hub-cat-nav");
-  var list = window.VIXO_CATEGORIES;
+  var mounted = window.vixoMountedCategories;
+  var list = Array.isArray(mounted) && mounted.length ? mounted : window.VIXO_CATEGORIES;
   if (!nav || !list || !list.length) return;
 
   var isSmall = window.matchMedia("(max-width: 768px)").matches;
@@ -41,6 +55,12 @@ document.addEventListener("vixo:games-loaded", function () {
   }
 });
 
+document.addEventListener("vixo:categories-ready", function () {
+  if (document.body.classList.contains("home-crazy")) {
+    populateHubCategories();
+  }
+});
+
 function initHubSidebar() {
   var toggle = document.querySelector(".menu-toggle");
   var backdrop = document.getElementById("hub-sidebar-backdrop");
@@ -48,12 +68,18 @@ function initHubSidebar() {
 
   function closeNav() {
     document.body.classList.remove("hub-nav-open");
-    if (toggle) toggle.setAttribute("aria-expanded", "false");
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Open menu");
+    }
   }
 
   function openNav() {
     document.body.classList.add("hub-nav-open");
-    if (toggle) toggle.setAttribute("aria-expanded", "true");
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", "Close menu");
+    }
   }
 
   if (toggle) {
