@@ -19,7 +19,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="description" content="Browse free browser games by category on VixoGames." />
-  <title>Category – VixoGames</title>
+  <title>All categories – VixoGames</title>
   <link rel="icon" href="logo/logo.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=8" />
@@ -27,8 +27,8 @@
   <link rel="stylesheet" href="css/fantasy-magic.css?v=1" />
   <link rel="stylesheet" href="css/kid-animations.css?v=1" />
   <link rel="stylesheet" href="css/ads.css?v=24" />
-  <link rel="stylesheet" href="css/categories-page.css?v=1" />
-  <link rel="stylesheet" href="css/mobile.css?v=1" />
+  <link rel="stylesheet" href="css/categories-page.css?v=3" />
+  <link rel="stylesheet" href="css/mobile.css?v=5" />
   <link rel="stylesheet" href="css/thumb-bg.css?v=1" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
@@ -48,24 +48,53 @@
   </aside>
   <div class="page-content">
   <main class="category-page">
-    <nav class="category-breadcrumb" aria-label="Breadcrumb">
-      <a href="index.html">Home</a>
-      <span aria-hidden="true">/</span>
-      <span id="category-breadcrumb-current">Category</span>
-    </nav>
-    <header class="category-page-head">
-      <h1 id="category-page-title">Loading…</h1>
-      <p class="category-page-lead" id="category-page-desc"></p>
-      <p class="category-page-count" id="category-page-count" hidden></p>
-    </header>
-    <section class="game-section category-page-section" aria-live="polite">
-      <div class="game-grid game-grid--dense" id="category-games-grid">
-        <p class="category-page-status">Loading games…</p>
-      </div>
-      <div class="load-more-wrap category-load-more-wrap" id="category-load-wrap" hidden>
-        <button type="button" class="btn btn-primary btn-load-more" id="category-load-more">Load more games</button>
+    <section id="category-browse-view" class="category-browse" aria-labelledby="category-browse-title">
+      <nav class="category-breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span aria-hidden="true">/</span>
+        <span>Categories</span>
+      </nav>
+      <header class="category-page-head">
+        <h1 id="category-browse-title">All categories</h1>
+        <p class="category-page-lead">Pick a category to browse free games — tap any tile below.</p>
+      </header>
+      <label class="category-browse-search-wrap">
+        <span class="visually-hidden">Search categories</span>
+        <input
+          type="search"
+          id="category-browse-search"
+          class="category-browse-search"
+          placeholder="Search categories…"
+          autocomplete="off"
+        />
+      </label>
+      <div class="category-tiles-grid" id="category-tiles-grid" aria-live="polite">
+        <p class="category-page-status">Loading categories…</p>
       </div>
     </section>
+
+    <div id="category-games-view" class="category-games-view is-hidden" hidden>
+      <nav class="category-breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="categories.html">Categories</a>
+        <span aria-hidden="true">/</span>
+        <span id="category-breadcrumb-current">Category</span>
+      </nav>
+      <header class="category-page-head">
+        <h1 id="category-page-title">Loading…</h1>
+        <p class="category-page-lead" id="category-page-desc"></p>
+        <p class="category-page-count" id="category-page-count" hidden></p>
+      </header>
+      <section class="game-section category-page-section" aria-live="polite">
+        <div class="game-grid game-grid--dense" id="category-games-grid">
+          <p class="category-page-status">Loading games…</p>
+        </div>
+        <div class="load-more-wrap category-load-more-wrap" id="category-load-wrap" hidden>
+          <button type="button" class="btn btn-primary btn-load-more" id="category-load-more">Load more games</button>
+        </div>
+      </section>
+    </div>
   </main>
   <footer class="site-footer site-footer--static">
     <p class="footer-copy">© 2026 VixoGames · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="index.html">Home</a></p>
@@ -77,12 +106,13 @@
     </div>
   </aside>
   </div>
-  <script src="js/categories.js?v=1" defer></script>
+  <script src="js/categories.js?v=2" defer></script>
   <script src="js/routes.js?v=4" defer></script>
   <script src="js/storage.js?v=3" defer></script>
-  <script src="js/gamepix.js?v=17" defer></script>
+  <script src="js/gamepix.js?v=25" defer></script>
+  <script src="js/category-catalog.js?v=1" defer></script>
   <script src="js/animations.js?v=2" defer></script>
-  <script src="js/categories-page.js?v=1" defer></script>
+  <script src="js/categories-page.js?v=3" defer></script>
   <script src="js/ad-slot.js?v=11" defer></script>
   <script src="js/magic-bg.js?v=2" defer></script>
   <script src="js/thumb-bg.js?v=1" defer></script>

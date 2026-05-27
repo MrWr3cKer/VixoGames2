@@ -234,8 +234,8 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
 .hub-cat-nav a {
   display: block;
   width: 100%;
-  padding: 0.45rem 0.75rem;
-  font-size: 0.82rem;
+  padding: 0.38rem 0.65rem;
+  font-size: 0.78rem;
   line-height: 1.35;
   color: var(--text-muted);
   border-radius: 8px;
@@ -623,16 +623,27 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
     left: 0;
     top: var(--header-h);
     bottom: 0;
-    z-index: 95;
+    z-index: 200;
     max-height: none;
     height: calc(100dvh - var(--header-h));
-    transform: translateX(-105%);
-    transition: transform 0.3s var(--ease);
-    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
+    width: min(92vw, 300px);
+    background: #0c0818 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translate3d(-110%, 0, 0);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.32s var(--ease),
+      visibility 0.32s;
+    box-shadow: 12px 0 48px rgba(0, 0, 0, 0.65);
   }
 
   body.hub-nav-open .hub-sidebar {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+    pointer-events: auto;
     touch-action: pan-y;
     overscroll-behavior: contain;
   }
@@ -640,6 +651,11 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
   body.hub-nav-open .hub-cat-nav {
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .hub-sidebar-backdrop {
+    z-index: 190;
+    background: rgba(0, 0, 0, 0.78);
   }
 
   body.hub-nav-open .hub-sidebar-backdrop {
@@ -676,17 +692,7 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
     display: flex !important;
   }
 
-  .home-crazy {
-    --hub-row-card: 44vw;
-  }
-
-  .game-row-wrap .game-card-link {
-    aspect-ratio: 16 / 10;
-  }
-
-  .game-row-wrap .game-card--featured {
-    flex-basis: 62vw;
-  }
+  /* Row card size — overridden in mobile.css for swipe rows */
 
   .home-crazy .section-head--hub h2 {
     font-size: 1.05rem;
@@ -696,27 +702,6 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
     font-size: 0.78rem;
   }
 
-  .hub-sidebar {
-    width: min(90vw, 320px);
-  }
-
-  .hub-cat-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.35rem;
-    padding-right: 0.75rem;
-  }
-
-  .hub-cat-nav a {
-    font-size: 0.78rem;
-    padding: 0.45rem 0.55rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .hub-cat-nav a:hover {
-    background: rgba(124, 58, 237, 0.22);
-  }
 }
 
 @media (max-width: 640px) {
@@ -734,9 +719,6 @@ body.hub-nav-open .home-crazy .menu-toggle__bar:nth-child(3) {
     padding: 0.75rem 0.85rem 2.5rem;
   }
 
-  .home-crazy {
-    --hub-row-card: 140px;
-  }
 }
 
 /* Desktop with ad rails — sidebar stays inside center column */

@@ -16,7 +16,7 @@ const QUICK_LOAD_PAGES = 2;
 const CATEGORY_PAGES_EACH = 1;
 /** Max parallel category fetches (all queued at once, drained in batches) */
 const MAX_CATEGORY_FETCHES = 4;
-const MAX_CATEGORY_FETCHES_MOBILE = 2;
+const MAX_CATEGORY_FETCHES_MOBILE = 1;
 
 function vixoIsMobilePerf() {
   return (
@@ -27,6 +27,38 @@ function vixoIsMobilePerf() {
 
 function vixoMaxCategoryFetches() {
   return vixoIsMobilePerf() ? MAX_CATEGORY_FETCHES_MOBILE : MAX_CATEGORY_FETCHES;
+}
+
+function vixoTrendingShow() {
+  return vixoIsMobilePerf() ? 10 : TRENDING_SHOW;
+}
+
+function vixoNewShow() {
+  return vixoIsMobilePerf() ? 8 : NEW_SHOW;
+}
+
+let categoryObserveIo = null;
+
+function observeCategoryPlaceholder(placeholder, slug) {
+  if (!("IntersectionObserver" in window)) {
+    queueCategoryFetch(placeholder, slug);
+    return;
+  }
+  if (!categoryObserveIo) {
+    categoryObserveIo = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const catSlug = el.dataset.lazyCategory;
+          categoryObserveIo.unobserve(el);
+          if (catSlug) queueCategoryFetch(el, catSlug);
+        });
+      },
+      { root: null, rootMargin: "280px 0px", threshold: 0 }
+    );
+  }
+  categoryObserveIo.observe(placeholder);
 }
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
@@ -210,17 +242,34 @@ function drainCategoryQueue() {
   }
 }
 
-function queueCategoryFetch(placeholder, slug) {
-  if (
-    placeholder.dataset.lazyLoaded === "1" ||
-    placeholder.dataset.lazyQueued === "1"
-  ) {
-    return;
+function queueCategoryFetch(placeholder, slug, priority) {
+  if (placeholder.dataset.lazyLoaded === "1") return;
+  if (placeholder.dataset.lazyQueued === "1") {
+    if (!priority) return;
+    categoryFetchQueue = categoryFetchQueue.filter(function (job) {
+      return job.placeholder !== placeholder;
+    });
+  } else {
+    placeholder.dataset.lazyQueued = "1";
   }
-  placeholder.dataset.lazyQueued = "1";
-  categoryFetchQueue.push({ placeholder: placeholder, slug: slug });
+  const job = { placeholder: placeholder, slug: slug };
+  if (priority) {
+    categoryFetchQueue.unshift(job);
+  } else {
+    categoryFetchQueue.push(job);
+  }
   drainCategoryQueue();
 }
+
+function ensureCategoryLoaded(slug) {
+  if (!slug) return;
+  const el = document.getElementById("cat-" + slug);
+  if (!el) return;
+  if (el.dataset.lazyLoaded === "1") return;
+  queueCategoryFetch(el, slug, true);
+}
+
+window.vixoEnsureCategoryLoaded = ensureCategoryLoaded;
 
 function initCategoryRows() {
   const categoryRoot = document.getElementById("category-sections");
@@ -228,13 +277,19 @@ function initCategoryRows() {
   categoryRoot.dataset.categoriesInit = "1";
   categoryRoot.innerHTML = "";
 
-  HOME_CATEGORIES.forEach(function (cat, index) {
+  const cached =
+    window.vixoCategoryCatalog &&
+    window.vixoCategoryCatalog.getCachedValidSlugs
+      ? window.vixoCategoryCatalog.getCachedValidSlugs()
+      : null;
+
+  HOME_CATEGORIES.forEach(function (cat) {
+    if (cached && !cached.has(cat.slug)) return;
+
     const placeholder = createCategoryPlaceholder(cat);
     categoryRoot.appendChild(placeholder);
     if (vixoIsMobilePerf()) {
-      window.setTimeout(function () {
-        queueCategoryFetch(placeholder, cat.slug);
-      }, index * 120);
+      observeCategoryPlaceholder(placeholder, cat.slug);
     } else {
       queueCategoryFetch(placeholder, cat.slug);
     }
@@ -810,26 +865,28 @@ function applyHomepageEssentials(allPages) {
   const featured = allPages[0];
   if (featured) updateHeroFromGame(featured);
 
-  const trending = allPages.slice(0, TRENDING_SHOW);
+  const trendingCount = vixoTrendingShow();
+  const newCount = vixoNewShow();
+  const trending = allPages.slice(0, trendingCount);
   renderGameCards(trendingGrid, trending, function (item, index) {
     return {
       tag: index === 0 ? "top" : index < 4 ? "hot" : null,
-      featured: index === 0,
+      featured: index === 0 && !vixoIsMobilePerf(),
       showFavorite: true,
-      eager: index < 3,
+      eager: index < (vixoIsMobilePerf() ? 2 : 3),
     };
   });
   setSectionCount("count-trending", trending.length);
   startHeroRotation(trending.slice(0, 6));
 
-  const newGames = allPages.slice(TRENDING_SHOW, TRENDING_SHOW + NEW_SHOW);
+  const newGames = allPages.slice(trendingCount, trendingCount + newCount);
   if (newGrid) {
     const newList =
       newGames.length >= 8
         ? newGames
         : allPages.slice(
-            Math.floor(TRENDING_SHOW / 2),
-            Math.floor(TRENDING_SHOW / 2) + NEW_SHOW
+            Math.floor(trendingCount / 2),
+            Math.floor(trendingCount / 2) + newCount
           );
     renderGameCards(newGrid, newList, function (item, index) {
       return { tag: index < 2 ? "new" : null, large: false, showFavorite: true };
@@ -845,7 +902,7 @@ function applyHomepageEssentials(allPages) {
   const forAll = allPages.filter(function (g) {
     return !usedInMain.has(g.namespace);
   });
-  const allShow = vixoIsMobilePerf() ? 20 : INITIAL_ALL_SHOW;
+  const allShow = vixoIsMobilePerf() ? 16 : INITIAL_ALL_SHOW;
   appendAllGames(forAll.slice(0, allShow), true);
   allGamesPage = INITIAL_MAIN_PAGES + 1;
   allGamesHasMore =
@@ -1021,7 +1078,9 @@ window.vixoGamePix = {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  loadGamePixHomepage();
+  if (document.getElementById("gamepix-trending")) {
+    loadGamePixHomepage();
+  }
 
   const loadMoreBtn = document.getElementById("load-more");
   if (loadMoreBtn) {

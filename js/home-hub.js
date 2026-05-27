@@ -1,5 +1,19 @@
 var pendingCategoryScrollId = null;
 
+var HUB_MOBILE_POPULAR_SLUGS = [
+  "multiplayer",
+  "battle",
+  "arcade",
+  "match-3",
+  "racing",
+  "sports",
+  "shooting",
+  "casual",
+  "strategy",
+  "io",
+  "kids",
+];
+
 function getScrollOffsetTop() {
   var header = document.querySelector(".site-header");
   var headerH = header ? header.getBoundingClientRect().height : 72;
@@ -25,13 +39,207 @@ function scrollToPageSection(target) {
   return true;
 }
 
+function isMobileHub() {
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
+function getCategoryList() {
+  return (window.VIXO_CATEGORIES || []).slice();
+}
+
+function orderBySlugs(list, slugs) {
+  var map = {};
+  list.forEach(function (cat) {
+    map[cat.slug] = cat;
+  });
+  return slugs
+    .map(function (slug) {
+      return map[slug];
+    })
+    .filter(Boolean);
+}
+
+function renderHubCatLink(cat, parent) {
+  var a = document.createElement("a");
+  a.href = "#cat-" + cat.slug;
+  a.textContent = cat.title;
+  a.dataset.catTitle = (cat.title || "").toLowerCase();
+  parent.appendChild(a);
+}
+
+function renderMobileQuickCategories(list) {
+  var strip = document.getElementById("hub-mobile-cats");
+  if (!strip) return;
+
+  strip.innerHTML = "";
+  if (!isMobileHub()) {
+    strip.classList.add("is-hidden");
+    return;
+  }
+  strip.classList.remove("is-hidden");
+
+  var quick = orderBySlugs(list, HUB_MOBILE_POPULAR_SLUGS).slice(0, 10);
+  if (!quick.length) quick = list.slice(0, 10);
+
+  quick.forEach(function (cat) {
+    var a = document.createElement("a");
+    a.className = "hub-mobile-cats__chip";
+    a.href = "#cat-" + cat.slug;
+    a.textContent = cat.title;
+    strip.appendChild(a);
+  });
+
+  var more = document.createElement("a");
+  more.className = "hub-mobile-cats__chip hub-mobile-cats__chip--more";
+  more.href = "categories.html?view=all";
+  more.textContent = "All";
+  strip.appendChild(more);
+}
+
+function renderHubCategoryNav(list) {
+  var nav = document.getElementById("hub-cat-nav");
+  if (!nav || !list.length) return;
+
+  var isSmall = isMobileHub();
+  var filterInput = document.getElementById("hub-cat-filter");
+  var filterQuery = filterInput ? filterInput.value : "";
+  nav.innerHTML = "";
+
+  var drawerList = isSmall
+    ? orderBySlugs(list, HUB_MOBILE_POPULAR_SLUGS)
+    : list;
+
+  if (isSmall && !drawerList.length) {
+    drawerList = list.slice(0, 14);
+  }
+
+  drawerList.forEach(function (cat) {
+    renderHubCatLink(cat, nav);
+  });
+
+  var oldMore = document.getElementById("hub-cat-more");
+  if (oldMore) oldMore.remove();
+
+  if (isSmall) {
+    var more = document.createElement("a");
+    more.id = "hub-cat-more";
+    more.className = "hub-cat-nav__all";
+    more.href = "categories.html?view=all";
+    more.textContent = "Browse all categories →";
+    nav.parentElement.appendChild(more);
+  } else if (list.length > drawerList.length) {
+    var moreDesktop = document.createElement("a");
+    moreDesktop.id = "hub-cat-more";
+    moreDesktop.className = "hub-cat-nav__all";
+    moreDesktop.href = "#library";
+    moreDesktop.textContent = "See full library";
+    nav.parentElement.appendChild(moreDesktop);
+  }
+
+  renderMobileQuickCategories(list);
+  initHubCategoryFilter();
+
+  if (filterQuery && filterInput) {
+    filterInput.value = filterQuery;
+    filterInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+}
+
+function populateHubCategories() {
+  var nav = document.getElementById("hub-cat-nav");
+  var list = getCategoryList();
+  if (!nav || !list.length) return;
+
+  var catalog = window.vixoCategoryCatalog;
+  if (!catalog || !catalog.filterCategoriesWithGames) {
+    renderHubCategoryNav(list);
+    return;
+  }
+
+  var cached = catalog.getCachedValidSlugs();
+  if (cached) {
+    renderHubCategoryNav(
+      list.filter(function (cat) {
+        return cached.has(cat.slug);
+      })
+    );
+    return;
+  }
+
+  nav.innerHTML =
+    '<p class="hub-cat-nav-status">Loading categories…</p>';
+
+  catalog
+    .filterCategoriesWithGames(list)
+    .then(function (valid) {
+      document.dispatchEvent(
+        new CustomEvent("vixo:valid-categories-ready", {
+          detail: { slugs: valid.map(function (c) { return c.slug; }) },
+        })
+      );
+      if (!valid.length) {
+        nav.innerHTML =
+          '<p class="hub-cat-nav-status">No categories available.</p>';
+        return;
+      }
+      renderHubCategoryNav(valid);
+    })
+    .catch(function () {
+      renderHubCategoryNav(list);
+    });
+}
+
+function pruneInvalidCategorySections(validSlugs) {
+  if (!validSlugs || !validSlugs.length) return;
+  var allowed = new Set(validSlugs);
+  document
+    .querySelectorAll("[data-lazy-category], [data-category-block]")
+    .forEach(function (el) {
+      var slug = el.dataset.lazyCategory || el.dataset.categoryBlock;
+      if (slug && !allowed.has(slug)) {
+        el.remove();
+      }
+    });
+}
+
+function initHubCategoryFilter() {
+  var input = document.getElementById("hub-cat-filter");
+  var nav = document.getElementById("hub-cat-nav");
+  if (!input || !nav) return;
+
+  if (!isMobileHub()) {
+    input.classList.add("is-hidden");
+    input.value = "";
+    nav.querySelectorAll("a").forEach(function (link) {
+      link.hidden = false;
+    });
+    return;
+  }
+
+  input.classList.remove("is-hidden");
+
+  if (input.dataset.filterWired === "1") return;
+  input.dataset.filterWired = "1";
+
+  input.addEventListener("input", function () {
+    var q = input.value.trim().toLowerCase();
+    nav.querySelectorAll("a").forEach(function (link) {
+      if (!link.dataset.catTitle) return;
+      var match =
+        !q ||
+        link.dataset.catTitle.indexOf(q) !== -1 ||
+        link.textContent.toLowerCase().indexOf(q) !== -1;
+      link.hidden = !match;
+    });
+  });
+}
+
 /**
  * CrazyGames-style hub: sidebar drawer + horizontal row scrollers
  */
 document.addEventListener("DOMContentLoaded", function () {
   if (!document.body.classList.contains("home-crazy")) return;
 
-  // Always open homepage from the top; avoid anchor/hash auto-jumps.
   if (window.history && "scrollRestoration" in window.history) {
     window.history.scrollRestoration = "manual";
   }
@@ -48,34 +256,11 @@ document.addEventListener("DOMContentLoaded", function () {
   populateHubCategories();
   initHubSidebar();
   initGameRowScrollers();
-});
 
-function populateHubCategories() {
-  var nav = document.getElementById("hub-cat-nav");
-  var mounted = window.vixoMountedCategories;
-  var list = Array.isArray(mounted) && mounted.length ? mounted : window.VIXO_CATEGORIES;
-  if (!nav || !list || !list.length) return;
-
-  var isSmall = window.matchMedia("(max-width: 768px)").matches;
-  var visible = isSmall ? list.slice(0, 24) : list;
-  nav.innerHTML = "";
-  visible.forEach(function (cat) {
-    var a = document.createElement("a");
-    a.href = "#cat-" + cat.slug;
-    a.textContent = cat.title;
-    nav.appendChild(a);
+  window.addEventListener("resize", function () {
+    populateHubCategories();
   });
-
-  var oldMore = document.getElementById("hub-cat-more");
-  if (oldMore) oldMore.remove();
-  if (isSmall && list.length > visible.length) {
-    var more = document.createElement("a");
-    more.id = "hub-cat-more";
-    more.href = "#library";
-    more.textContent = "See all categories";
-    nav.parentElement.appendChild(more);
-  }
-}
+});
 
 document.addEventListener("vixo:games-loaded", function () {
   if (document.body.classList.contains("home-crazy")) {
@@ -83,10 +268,11 @@ document.addEventListener("vixo:games-loaded", function () {
   }
 });
 
-document.addEventListener("vixo:categories-ready", function () {
-  if (document.body.classList.contains("home-crazy")) {
-    populateHubCategories();
-  }
+document.addEventListener("vixo:valid-categories-ready", function (ev) {
+  if (!document.body.classList.contains("home-crazy")) return;
+  var slugs = (ev && ev.detail && ev.detail.slugs) || [];
+  pruneInvalidCategorySections(slugs);
+  populateHubCategories();
 });
 
 function initHubSidebar() {
@@ -118,6 +304,14 @@ function initHubSidebar() {
   function closeNav() {
     document.body.classList.remove("hub-nav-open");
     unlockPageScroll();
+    var filter = document.getElementById("hub-cat-filter");
+    if (filter) filter.value = "";
+    var nav = document.getElementById("hub-cat-nav");
+    if (nav) {
+      nav.querySelectorAll("a").forEach(function (link) {
+        link.hidden = false;
+      });
+    }
     if (toggle) {
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("aria-label", "Open menu");
@@ -137,6 +331,14 @@ function initHubSidebar() {
     if (!href || href.charAt(0) !== "#") return;
     var id = href.slice(1);
     if (!id) return;
+
+    if (id.indexOf("cat-") === 0) {
+      var slug = id.slice(4);
+      if (slug && typeof window.vixoEnsureCategoryLoaded === "function") {
+        window.vixoEnsureCategoryLoaded(slug);
+      }
+    }
+
     var target = document.getElementById(id);
     if (!target) {
       pendingCategoryScrollId = id;
@@ -146,7 +348,7 @@ function initHubSidebar() {
 
     window.setTimeout(function () {
       scrollToPageSection(target);
-    }, isDrawer() ? 280 : 0);
+    }, isDrawer() ? 320 : 0);
   }
 
   if (sidebar) {
@@ -160,6 +362,16 @@ function initHubSidebar() {
       e.preventDefault();
       if (isDrawer()) closeNav();
       scrollToHashTarget(href);
+    });
+  }
+
+  var mobileCats = document.getElementById("hub-mobile-cats");
+  if (mobileCats) {
+    mobileCats.addEventListener("click", function (e) {
+      var link = e.target.closest("a[href^='#']");
+      if (!link) return;
+      e.preventDefault();
+      scrollToHashTarget(link.getAttribute("href"));
     });
   }
 
