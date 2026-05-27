@@ -3,12 +3,13 @@
  */
 document.addEventListener("DOMContentLoaded", function () {
   var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var mobilePerf = window.matchMedia("(max-width: 768px)").matches;
 
   var sections = document.querySelectorAll(
     ".game-section, .user-section, .home-stats, .hero--home"
   );
 
-  if (prefersReduced) {
+  if (prefersReduced || mobilePerf) {
     sections.forEach(function (el) {
       el.classList.add("is-visible");
     });

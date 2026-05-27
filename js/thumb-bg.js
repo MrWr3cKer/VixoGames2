@@ -24,6 +24,14 @@
 
 
 
+  function isMobilePerf() {
+
+    return window.matchMedia("(max-width: 768px)").matches;
+
+  }
+
+
+
   var TILE_W = 88;
 
   var GAP = 7;
@@ -702,7 +710,7 @@
 
   async function boot() {
 
-    if (built) return;
+    if (built || isMobilePerf()) return;
 
     if (!bootStarted) bootStarted = true;
 
@@ -740,7 +748,7 @@
 
   function scheduleBoot() {
 
-    if (built || bootScheduled) return;
+    if (built || bootScheduled || isMobilePerf()) return;
 
     bootScheduled = true;
 
@@ -790,6 +798,16 @@
 
     if (!ensureRoot()) return;
 
+    if (isMobilePerf()) {
+
+      root.classList.add("is-mobile-static");
+
+      root.classList.add("is-ready");
+
+      return;
+
+    }
+
     scheduleBoot();
 
   }
@@ -797,6 +815,8 @@
 
 
   document.addEventListener("vixo:games-loaded", function () {
+
+    if (isMobilePerf()) return;
 
     if (built) {
 

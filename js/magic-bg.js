@@ -8,6 +8,9 @@
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return;
   }
+  if (window.matchMedia("(max-width: 768px)").matches) {
+    return;
+  }
 
   var skipClick =
     "a,button,input,select,textarea,label,iframe," +

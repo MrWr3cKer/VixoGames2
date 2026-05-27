@@ -200,3 +200,110 @@ body {
     padding-right: max(0.65rem, env(safe-area-inset-right));
   }
 }
+
+/* ─── Phone performance (iPhone 11 class devices) ─── */
+@media (max-width: 768px) {
+  /* Static gradient instead of RAF + hundreds of blurred tiles */
+  .game-thumb-bg.is-mobile-static {
+    display: none !important;
+  }
+
+  body.home-crazy::before,
+  body.has-thumb-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 90% 55% at 50% -8%, rgba(124, 58, 237, 0.22), transparent 58%),
+      radial-gradient(ellipse 70% 45% at 100% 40%, rgba(59, 130, 246, 0.1), transparent 50%),
+      linear-gradient(168deg, #0c0818 0%, #120a22 45%, #0a0612 100%);
+  }
+
+  /* backdrop-filter is very expensive on iOS Safari */
+  .site-header,
+  .home-crazy .site-header,
+  .hub-sidebar,
+  .hub-drawer__panel,
+  .hub-drawer__backdrop,
+  .search-dropdown,
+  .contact-modal__backdrop,
+  .contact-modal__panel,
+  .play-header,
+  .play-sidebar,
+  .play-glass,
+  .game-stage-wrap {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .home-crazy .site-header {
+    background: rgba(12, 8, 22, 0.94);
+  }
+
+  .hub-drawer__panel {
+    background: rgba(14, 10, 26, 0.98);
+  }
+
+  .contact-modal__panel {
+    background: rgba(16, 12, 28, 0.98);
+  }
+
+  /* Decorative motion off */
+  .bg-glow::after,
+  .bg-glow--fantasy::after,
+  .hub-welcome__card::before,
+  .hub-pill--pulse,
+  #magic-ripples {
+    animation: none !important;
+    display: none !important;
+  }
+
+  .game-fav-btn.is-active,
+  .game-fav-btn:hover,
+  .game-tag,
+  .hero-badge,
+  .play-btn {
+    animation: none !important;
+  }
+
+  /* Defer paint for off-screen category rows */
+  .game-section--category,
+  .user-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 380px;
+  }
+
+  /* Faster taps, less scroll jank */
+  a,
+  button,
+  .game-card-link,
+  .nav-link,
+  .cat-chip {
+    touch-action: manipulation;
+  }
+
+  .game-row {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .hub-welcome__thumb img,
+  .game-thumb-bg__track {
+    will-change: auto;
+  }
+
+  /* Lighter hero card on phones */
+  .hub-welcome__card {
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  .hub-welcome__card.is-hero-active {
+    transition: none;
+  }
+}
+
+html.vixo-mobile .game-thumb-bg:not(.is-ready) {
+  opacity: 0;
+}

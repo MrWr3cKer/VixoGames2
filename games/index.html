@@ -20,6 +20,13 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <script>
+    (function () {
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.documentElement.classList.add("vixo-mobile");
+      }
+    })();
+  </script>
   <meta name="description" content="Play a free browser game on VixoGames — no download required." />
   <link rel="canonical" id="canonical-url" href="" />
   <title>Play – VixoGames</title>
@@ -34,7 +41,7 @@
   <link rel="stylesheet" href="../css/kid-animations.css?v=1" />
   <link rel="stylesheet" href="../css/ads.css?v=24" />
   <link rel="stylesheet" href="../css/thumb-bg.css?v=12" />
-  <link rel="stylesheet" href="../css/mobile.css?v=1" />
+  <link rel="stylesheet" href="../css/mobile.css?v=2" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
 <body class="play-page has-ad-rail has-thumb-bg">
@@ -149,7 +156,7 @@
   <script src="../js/storage.js?v=3" defer></script>
   <script src="../js/ad-slot.js?v=11" defer></script>
   <script src="../js/magic-bg.js?v=2" defer></script>
-  <script src="../js/thumb-bg.js?v=11" defer></script>
+  <script src="../js/thumb-bg.js?v=12" defer></script>
   <script src="../js/animations.js?v=3" defer></script>
   <script src="../js/play.js?v=14" defer></script>
 </body>

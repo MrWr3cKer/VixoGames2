@@ -16,6 +16,18 @@ const QUICK_LOAD_PAGES = 2;
 const CATEGORY_PAGES_EACH = 1;
 /** Max parallel category fetches (all queued at once, drained in batches) */
 const MAX_CATEGORY_FETCHES = 4;
+const MAX_CATEGORY_FETCHES_MOBILE = 2;
+
+function vixoIsMobilePerf() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 768px)").matches
+  );
+}
+
+function vixoMaxCategoryFetches() {
+  return vixoIsMobilePerf() ? MAX_CATEGORY_FETCHES_MOBILE : MAX_CATEGORY_FETCHES;
+}
 
 let activePageSize = GAMEPIX_PAGE_SIZE;
 const TRENDING_SHOW = 16;
@@ -186,7 +198,7 @@ async function fetchAndMountCategory(placeholder, slug) {
 }
 
 function drainCategoryQueue() {
-  while (categoryFetchActive < MAX_CATEGORY_FETCHES && categoryFetchQueue.length) {
+  while (categoryFetchActive < vixoMaxCategoryFetches() && categoryFetchQueue.length) {
     const job = categoryFetchQueue.shift();
     categoryFetchActive++;
     fetchAndMountCategory(job.placeholder, job.slug)
@@ -216,10 +228,16 @@ function initCategoryRows() {
   categoryRoot.dataset.categoriesInit = "1";
   categoryRoot.innerHTML = "";
 
-  HOME_CATEGORIES.forEach(function (cat) {
+  HOME_CATEGORIES.forEach(function (cat, index) {
     const placeholder = createCategoryPlaceholder(cat);
     categoryRoot.appendChild(placeholder);
-    queueCategoryFetch(placeholder, cat.slug);
+    if (vixoIsMobilePerf()) {
+      window.setTimeout(function () {
+        queueCategoryFetch(placeholder, cat.slug);
+      }, index * 120);
+    } else {
+      queueCategoryFetch(placeholder, cat.slug);
+    }
   });
 }
 
@@ -696,6 +714,7 @@ function startHeroRotation(items) {
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return;
   }
+  if (vixoIsMobilePerf()) return;
   heroRotationTimer = setInterval(function () {
     if (!heroRotationItems.length) return;
     heroRotationIndex = (heroRotationIndex + 1) % heroRotationItems.length;
@@ -826,10 +845,11 @@ function applyHomepageEssentials(allPages) {
   const forAll = allPages.filter(function (g) {
     return !usedInMain.has(g.namespace);
   });
-  appendAllGames(forAll.slice(0, INITIAL_ALL_SHOW), true);
+  const allShow = vixoIsMobilePerf() ? 20 : INITIAL_ALL_SHOW;
+  appendAllGames(forAll.slice(0, allShow), true);
   allGamesPage = INITIAL_MAIN_PAGES + 1;
   allGamesHasMore =
-    forAll.length > INITIAL_ALL_SHOW ||
+    forAll.length > allShow ||
     allPages.length >= activePageSize;
 
   window.vixoGames = dedupeGames(allPages.slice());
@@ -869,6 +889,7 @@ function applyHomepageExtras(seedPages, extraPages) {
 }
 
 async function loadHomepageExtrasInBackground(seedPages) {
+  if (vixoIsMobilePerf()) return;
   try {
     const extraPageCount = Math.max(0, INITIAL_MAIN_PAGES - QUICK_LOAD_PAGES);
     if (!extraPageCount) return;
