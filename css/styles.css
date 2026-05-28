@@ -1541,7 +1541,7 @@ main,
 
 @media (min-width: 768px) {
   .play-stage-shell:has(.game-stage--portrait) {
-    max-width: min(100%, 560px);
+    max-width: min(100%, 680px);
   }
 }
 
@@ -1863,7 +1863,7 @@ html.vixo-fs-active body {
   }
 
   .play-page .play-layout:has(.game-stage--portrait) .play-stage-shell {
-    max-width: min(100%, 560px);
+    max-width: min(100%, 820px);
     margin-left: auto;
     margin-right: auto;
   }
@@ -1925,7 +1925,7 @@ html.vixo-fs-active body {
   }
 
   .play-page .play-layout:has(.game-stage--portrait) .play-stage-shell {
-    max-width: min(100%, 640px);
+    max-width: min(100%, 760px);
     margin-left: auto;
     margin-right: auto;
   }

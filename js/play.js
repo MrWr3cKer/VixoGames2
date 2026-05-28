@@ -98,18 +98,22 @@ function applyGameStageSize(stage, params) {
       stage.classList.remove("game-stage--portrait");
     } else {
       maxWidth =
-        window.matchMedia("(min-width: 768px)").matches
-          ? "min(100%, 560px)"
-          : "min(100%, 420px)";
+        wideDesktop
+          ? "min(100%, 820px)"
+          : window.matchMedia("(min-width: 768px)").matches
+            ? "min(100%, 680px)"
+            : "min(100%, 420px)";
       stage.classList.add("game-stage--portrait");
       stage.classList.remove("game-stage--landscape");
     }
   } else if (orientation === "portrait") {
     aspect = "3 / 4";
     maxWidth =
-      window.matchMedia("(min-width: 768px)").matches
-        ? "min(100%, 560px)"
-        : "min(100%, 420px)";
+      wideDesktop
+        ? "min(100%, 820px)"
+        : window.matchMedia("(min-width: 768px)").matches
+          ? "min(100%, 680px)"
+          : "min(100%, 420px)";
     stage.classList.add("game-stage--portrait");
     stage.classList.remove("game-stage--landscape");
   } else if (orientation === "landscape") {
