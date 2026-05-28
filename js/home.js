@@ -2,9 +2,11 @@
  * Homepage extras: favorites, recent, play again, library sort/filter, search hints
  */
 document.addEventListener("DOMContentLoaded", function () {
+  initPreferenceOnboarding();
   initFavoriteDelegation();
   initLibraryControls();
   initPersonalSections();
+  initForYouSection();
   initRandomHeroButton();
   document.addEventListener("vixo:games-loaded", function () {
     if (window.vixoStorage?.upgradeStoredRefs()) {
@@ -12,14 +14,26 @@ document.addEventListener("DOMContentLoaded", function () {
       document.dispatchEvent(new CustomEvent("vixo:favorites-updated"));
     }
     initPersonalSections();
+    renderForYouGames();
+    reorderCategorySectionsByPreference();
     syncAllFavoriteButtons();
   });
   document.addEventListener("vixo:favorites-updated", function () {
     initPersonalSections();
+    renderForYouGames();
     syncAllFavoriteButtons();
   });
-  document.addEventListener("vixo:recent-updated", initPersonalSections);
+  document.addEventListener("vixo:recent-updated", function () {
+    initPersonalSections();
+    renderForYouGames();
+  });
   document.addEventListener("vixo:category-mounted", syncAllFavoriteButtons);
+  document.addEventListener("vixo:category-mounted", reorderCategorySectionsByPreference);
+  document.addEventListener("vixo:preferences-updated", function () {
+    renderForYouGames();
+    reorderCategorySectionsByPreference();
+  });
+  document.addEventListener("vixo:play-stats-updated", renderForYouGames);
 });
 
 function initRandomHeroButton() {
@@ -35,6 +49,188 @@ function initRandomHeroButton() {
     const pick = list[Math.floor(Math.random() * list.length)];
     const url = helpers.playUrl(pick);
     if (url) window.location.href = url;
+  });
+}
+
+function initPreferenceOnboarding() {
+  const prefs = window.vixoPersonalization;
+  if (!prefs || !prefs.shouldShowOnboarding || !prefs.shouldShowOnboarding()) return;
+  if (!document.body.classList.contains("home-crazy")) return;
+
+  const modal = document.createElement("div");
+  modal.id = "pref-modal";
+  modal.className = "pref-modal";
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+
+  const categories = (window.VIXO_CATEGORIES || []).slice(0, 16);
+  modal.innerHTML = `
+    <div class="pref-modal__backdrop" data-pref-close tabindex="-1" aria-hidden="true"></div>
+    <div class="pref-modal__panel" role="dialog" aria-modal="true" aria-labelledby="pref-modal-title">
+      <button type="button" class="pref-modal__close" data-pref-close aria-label="Close">✕</button>
+      <h2 id="pref-modal-title" class="pref-modal__title">Choose your favorite genres</h2>
+      <p class="pref-modal__lead">Pick up to 5. We will use this to show better recommendations.</p>
+      <p class="pref-modal__counter" id="pref-counter">0 / 5 selected</p>
+      <div class="pref-modal__grid" id="pref-grid"></div>
+      <div class="pref-modal__actions">
+        <button type="button" class="btn btn-ghost" data-pref-close>Skip</button>
+        <button type="button" class="btn btn-primary" id="pref-save">Save choices</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const grid = modal.querySelector("#pref-grid");
+  const counter = modal.querySelector("#pref-counter");
+  const saveBtn = modal.querySelector("#pref-save");
+  const selected = new Set();
+
+  function syncSelectionUi() {
+    const count = selected.size;
+    counter.textContent = `${count} / 5 selected`;
+    saveBtn.disabled = count === 0;
+    grid.querySelectorAll(".pref-chip").forEach(function (btn) {
+      btn.classList.toggle("is-selected", selected.has(btn.dataset.slug));
+    });
+  }
+
+  categories.forEach(function (cat) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "pref-chip";
+    btn.dataset.slug = cat.slug;
+    btn.textContent = cat.title;
+    btn.addEventListener("click", function () {
+      const slug = btn.dataset.slug;
+      if (selected.has(slug)) {
+        selected.delete(slug);
+      } else if (selected.size < 5) {
+        selected.add(slug);
+      }
+      syncSelectionUi();
+    });
+    grid.appendChild(btn);
+  });
+
+  function close(save) {
+    if (save) {
+      prefs.savePreferredGenres(Array.from(selected));
+    } else {
+      prefs.dismissOnboarding();
+    }
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("pref-modal-open");
+  }
+
+  modal.querySelectorAll("[data-pref-close]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      close(false);
+    });
+  });
+  saveBtn.addEventListener("click", function () {
+    close(true);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !modal.hidden) close(false);
+  });
+
+  syncSelectionUi();
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("pref-modal-open");
+}
+
+function ensureForYouElements() {
+  let section = document.getElementById("for-you");
+  if (section) {
+    return {
+      section: section,
+      grid: document.getElementById("for-you-grid"),
+    };
+  }
+  const anchor = document.getElementById("trending");
+  if (!anchor) return { section: null, grid: null };
+
+  section = document.createElement("section");
+  section.id = "for-you";
+  section.className = "game-section game-section--alt is-hidden";
+  section.dataset.section = "";
+  section.innerHTML = `
+    <div class="section-head section-head--hub">
+      <h2>Picked for you</h2>
+      <span class="section-desc">Based on your favorite genres and play history.</span>
+    </div>
+    <div class="game-grid game-grid--dense game-grid--row game-grid--hub" id="for-you-grid" aria-live="polite"></div>
+  `;
+  anchor.parentNode.insertBefore(section, anchor);
+  return {
+    section: section,
+    grid: section.querySelector("#for-you-grid"),
+  };
+}
+
+function initForYouSection() {
+  renderForYouGames();
+}
+
+function renderForYouGames() {
+  const prefs = window.vixoPersonalization;
+  if (!prefs || typeof createGameCard !== "function") return;
+
+  const els = ensureForYouElements();
+  const section = els.section;
+  const grid = els.grid;
+  if (!section || !grid) return;
+
+  const all = (window.vixoGames || []).slice();
+  if (!all.length) {
+    section.classList.add("is-hidden");
+    return;
+  }
+
+  const recentSet = new Set(
+    (window.vixoStorage?.getRecent?.() || []).map(function (r) {
+      return r.namespace;
+    })
+  );
+  const ranked = prefs
+    .rankGames(all)
+    .filter(function (g) {
+      return !recentSet.has(g.namespace);
+    })
+    .slice(0, 14);
+
+  if (!ranked.length) {
+    section.classList.add("is-hidden");
+    return;
+  }
+
+  section.classList.remove("is-hidden");
+  renderGameCards(grid, ranked, function (item, index) {
+    return {
+      showFavorite: true,
+      tag: index < 3 ? "hot" : null,
+      eager: index < 2,
+    };
+  });
+  syncAllFavoriteButtons();
+}
+
+function reorderCategorySectionsByPreference() {
+  const prefs = window.vixoPersonalization;
+  const top = prefs && prefs.getTopGenres ? prefs.getTopGenres(5) : [];
+  if (!top.length) return;
+  const root = document.getElementById("category-sections");
+  if (!root) return;
+  const bySlug = {};
+  Array.from(root.children).forEach(function (el) {
+    const slug = el.dataset.lazyCategory || el.dataset.categoryBlock;
+    if (slug) bySlug[slug] = el;
+  });
+  top.forEach(function (slug) {
+    const el = bySlug[slug];
+    if (el) root.prepend(el);
   });
 }
 

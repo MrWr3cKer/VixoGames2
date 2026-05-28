@@ -1,0 +1,116 @@
+.pref-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 230;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.pref-modal[hidden] {
+  display: none !important;
+}
+
+.pref-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 6, 14, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.pref-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 560px);
+  max-height: min(90vh, 760px);
+  overflow-y: auto;
+  padding: 1.2rem 1.2rem 1rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    155deg,
+    rgba(30, 24, 56, 0.98),
+    rgba(12, 10, 20, 0.99)
+  );
+  border: 1px solid rgba(168, 85, 247, 0.38);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.8),
+    0 26px 78px rgba(0, 0, 0, 0.64),
+    0 0 42px rgba(124, 58, 237, 0.24);
+}
+
+.pref-modal__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 9px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.pref-modal__title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 2rem 0.4rem 0;
+}
+
+.pref-modal__lead {
+  margin: 0 0 0.95rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.pref-modal__counter {
+  font-size: 0.8rem;
+  color: var(--accent-bright);
+  margin-bottom: 0.65rem;
+}
+
+.pref-modal__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.pref-chip {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(22, 18, 42, 0.85);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0.62rem 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+}
+
+.pref-chip.is-selected {
+  border-color: rgba(168, 85, 247, 0.72);
+  background: rgba(124, 58, 237, 0.26);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+.pref-modal__actions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.pref-modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 680px) {
+  .pref-modal__grid {
+    grid-template-columns: 1fr;
+  }
+}

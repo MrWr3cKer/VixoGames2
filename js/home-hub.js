@@ -14,6 +14,18 @@ var HUB_MOBILE_POPULAR_SLUGS = [
   "kids",
 ];
 
+function getHubPrioritySlugs() {
+  var prefs = window.vixoPersonalization;
+  var preferred = prefs && prefs.getTopGenres ? prefs.getTopGenres(6) : [];
+  var merged = preferred.concat(HUB_MOBILE_POPULAR_SLUGS);
+  var seen = {};
+  return merged.filter(function (slug) {
+    if (!slug || seen[slug]) return false;
+    seen[slug] = 1;
+    return true;
+  });
+}
+
 function getScrollOffsetTop() {
   var header = document.querySelector(".site-header");
   var headerH = header ? header.getBoundingClientRect().height : 72;
@@ -44,7 +56,18 @@ function isMobileHub() {
 }
 
 function getCategoryList() {
-  return (window.VIXO_CATEGORIES || []).slice();
+  var list = (window.VIXO_CATEGORIES || []).slice();
+  var prefs = window.vixoPersonalization;
+  var top = prefs && prefs.getTopGenres ? prefs.getTopGenres(5) : [];
+  if (!top.length) return list;
+  var topSet = new Set(top);
+  var head = list.filter(function (cat) {
+    return topSet.has(cat.slug);
+  });
+  var tail = list.filter(function (cat) {
+    return !topSet.has(cat.slug);
+  });
+  return head.concat(tail);
 }
 
 function orderBySlugs(list, slugs) {
@@ -78,7 +101,7 @@ function renderMobileQuickCategories(list) {
   }
   strip.classList.remove("is-hidden");
 
-  var quick = orderBySlugs(list, HUB_MOBILE_POPULAR_SLUGS).slice(0, 10);
+  var quick = orderBySlugs(list, getHubPrioritySlugs()).slice(0, 10);
   if (!quick.length) quick = list.slice(0, 10);
 
   quick.forEach(function (cat) {
@@ -105,9 +128,7 @@ function renderHubCategoryNav(list) {
   var filterQuery = filterInput ? filterInput.value : "";
   nav.innerHTML = "";
 
-  var drawerList = isSmall
-    ? orderBySlugs(list, HUB_MOBILE_POPULAR_SLUGS)
-    : list;
+  var drawerList = isSmall ? orderBySlugs(list, getHubPrioritySlugs()) : list;
 
   if (isSmall && !drawerList.length) {
     drawerList = list.slice(0, 14);
@@ -166,8 +187,32 @@ function populateHubCategories() {
     return;
   }
 
-  nav.innerHTML =
-    '<p class="hub-cat-nav-status">Loading categories…</p>';
+  if (isMobileHub()) {
+    /* Mobile first paint: show full list immediately, validate lazily. */
+    renderHubCategoryNav(list);
+    var runValidation = function () {
+      catalog
+        .filterCategoriesWithGames(list)
+        .then(function (valid) {
+          document.dispatchEvent(
+            new CustomEvent("vixo:valid-categories-ready", {
+              detail: { slugs: valid.map(function (c) { return c.slug; }) },
+            })
+          );
+          if (!valid.length) return;
+          renderHubCategoryNav(valid);
+        })
+        .catch(function () {});
+    };
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(runValidation, { timeout: 2500 });
+    } else {
+      window.setTimeout(runValidation, 1200);
+    }
+    return;
+  }
+
+  nav.innerHTML = '<p class="hub-cat-nav-status">Loading categories…</p>';
 
   catalog
     .filterCategoriesWithGames(list)

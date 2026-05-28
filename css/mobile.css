@@ -394,7 +394,7 @@ html.vixo-mobile .game-thumb-bg:not(.is-ready) {
 
   /* CrazyGames-style: smaller thumbs + swipe horizontally */
   .home-crazy {
-    --hub-row-card: 104px;
+    --hub-row-card: 112px;
     --hub-row-gap: 0.5rem;
   }
 

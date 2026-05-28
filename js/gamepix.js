@@ -12,6 +12,7 @@ const FETCH_TIMEOUT_MS = 15000;
 /** Main catalog pages — quick first, rest in background */
 const INITIAL_MAIN_PAGES = 3;
 const QUICK_LOAD_PAGES = 2;
+const QUICK_LOAD_PAGES_MOBILE = 1;
 /** Per category row on homepage — page 2 only when page 1 is full */
 const CATEGORY_PAGES_EACH = 1;
 /** Max parallel category fetches (all queued at once, drained in batches) */
@@ -37,7 +38,41 @@ function vixoNewShow() {
   return vixoIsMobilePerf() ? 8 : NEW_SHOW;
 }
 
+function vixoQuickLoadPages() {
+  return vixoIsMobilePerf() ? QUICK_LOAD_PAGES_MOBILE : QUICK_LOAD_PAGES;
+}
+
 let categoryObserveIo = null;
+let cardImageIo = null;
+
+function shouldUseCardImageIo() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(max-width: 768px)").matches &&
+    "IntersectionObserver" in window
+  );
+}
+
+function ensureCardImageIo() {
+  if (cardImageIo || !shouldUseCardImageIo()) return cardImageIo;
+  cardImageIo = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        const img = entry.target;
+        const src = img.getAttribute("data-src");
+        if (src && !img.src) {
+          img.src = src;
+        }
+        img.removeAttribute("data-src");
+        cardImageIo.unobserve(img);
+      });
+    },
+    { root: null, rootMargin: "220px 0px", threshold: 0.01 }
+  );
+  return cardImageIo;
+}
 
 function observeCategoryPlaceholder(placeholder, slug) {
   if (!("IntersectionObserver" in window)) {
@@ -146,11 +181,16 @@ async function fetchCategoryGames(catSlug, maxPages) {
 
 async function ensureFeedConnection() {
   let result = await fetchGamePixGamesSafe(1, null);
-  if (result.items.length) return true;
+  if (result.items.length) {
+    return { ok: true, firstPageItems: result.items };
+  }
 
   activePageSize = GAMEPIX_PAGE_SIZE_FALLBACK;
   result = await fetchGamePixGamesSafe(1, null);
-  return result.items.length > 0;
+  if (result.items.length) {
+    return { ok: true, firstPageItems: result.items };
+  }
+  return { ok: false, firstPageItems: [] };
 }
 
 /**
@@ -426,12 +466,18 @@ function createGameCard(item, options = {}) {
 
   const img = document.createElement("img");
   img.className = "game-thumb-img";
-  img.src = imageSrc;
   img.alt = item.title || "Game";
   img.loading = eager ? "eager" : "lazy";
   img.decoding = "async";
   if (eager && "fetchPriority" in img) {
     img.fetchPriority = "high";
+  }
+  const io = ensureCardImageIo();
+  if (!eager && io) {
+    img.setAttribute("data-src", imageSrc);
+    io.observe(img);
+  } else {
+    img.src = imageSrc;
   }
 
   const overlay = document.createElement("div");
@@ -904,7 +950,7 @@ function applyHomepageEssentials(allPages) {
   });
   const allShow = vixoIsMobilePerf() ? 16 : INITIAL_ALL_SHOW;
   appendAllGames(forAll.slice(0, allShow), true);
-  allGamesPage = INITIAL_MAIN_PAGES + 1;
+  allGamesPage = (window.vixoLoadedMainPages || vixoQuickLoadPages()) + 1;
   allGamesHasMore =
     forAll.length > allShow ||
     allPages.length >= activePageSize;
@@ -948,16 +994,18 @@ function applyHomepageExtras(seedPages, extraPages) {
 async function loadHomepageExtrasInBackground(seedPages) {
   if (vixoIsMobilePerf()) return;
   try {
-    const extraPageCount = Math.max(0, INITIAL_MAIN_PAGES - QUICK_LOAD_PAGES);
+    const quickPages = vixoQuickLoadPages();
+    const extraPageCount = Math.max(0, INITIAL_MAIN_PAGES - quickPages);
     if (!extraPageCount) return;
 
     const extraPages = await fetchGamePixPageRange(
-      QUICK_LOAD_PAGES + 1,
+      quickPages + 1,
       extraPageCount,
       null
     );
     if (!extraPages.length) return;
 
+    window.vixoLoadedMainPages = INITIAL_MAIN_PAGES;
     applyHomepageExtras(seedPages, extraPages);
   } catch (err) {
     console.warn("Background homepage load:", err);
@@ -989,14 +1037,21 @@ async function loadGamePixHomepage() {
   if (allGrid) setGridMessage(allGrid, "Loading library…", "loading");
 
   try {
-    const feedOk = await ensureFeedConnection();
-    if (!feedOk) {
+    const feed = await ensureFeedConnection();
+    if (!feed.ok) {
       throw new Error(
         "Could not reach GamePix. Check your internet connection, firewall, or ad blocker."
       );
     }
 
-    let allPages = await fetchGamePixPageRange(1, QUICK_LOAD_PAGES, null);
+    const quickPages = vixoQuickLoadPages();
+    window.vixoLoadedMainPages = quickPages;
+
+    let allPages = dedupeGames(feed.firstPageItems || []);
+    if (quickPages > 1) {
+      const extraQuickPages = await fetchGamePixPageRange(2, quickPages - 1, null);
+      allPages = dedupeGames(allPages.concat(extraQuickPages));
+    }
     if (!allPages.length) {
       throw new Error("No games returned from the feed.");
     }

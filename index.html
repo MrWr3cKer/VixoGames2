@@ -53,7 +53,9 @@
   <link rel="stylesheet" href="css/crazy-hub.css?v=13" />
   <link rel="stylesheet" href="css/thumb-bg.css?v=13" />
   <link rel="stylesheet" href="css/contact.css?v=2" />
-  <link rel="stylesheet" href="css/mobile.css?v=5" />
+  <link rel="stylesheet" href="css/mobile.css?v=6" />
+  <link rel="stylesheet" href="css/personalization.css?v=1" />
+  <link rel="stylesheet" href="css/game-finder.css?v=3" />
   <link rel="preconnect" href="https://data527.click" crossorigin />
 </head>
 <body class="has-ad-rail home-crazy">
@@ -96,6 +98,9 @@
 
     <button type="button" class="header-contact-btn" id="contact-open" aria-haspopup="dialog" aria-controls="contact-modal">
       Contact
+    </button>
+    <button type="button" class="finder-open-btn" id="finder-open" aria-haspopup="dialog" aria-controls="finder-modal">
+      Game Finder
     </button>
 
     <button type="button" class="menu-toggle menu-toggle--hub" aria-label="Open menu" aria-expanded="false" title="Menu">
@@ -352,7 +357,7 @@
 
   <aside class="ad-rail ad-rail--right" aria-label="Advertisement right">
     <div class="ad-rail__slot">
-      <ins style="width: 300px;height:1050px" data-width="300" data-height="1050" data-max_width="300" class="j23f8e8e243" data-domain="//data527.click" data-affquery="/af9ac30bdbdc9295466f/23f8e8e243/?placementName=banner4"><script src="//data527.click/js/responsive.js" async></script></ins>
+      <ins style="width: 300px;height:1050px" data-width="300" data-height="1050" data-max_width="300" class="j23f8e8e243" data-domain="//data527.click" data-affquery="/af9ac30bdbdc9295466f/23f8e8e243/?placementName=banner4"></ins>
     </div>
   </aside>
 
@@ -410,20 +415,48 @@
     </div>
   </div>
 
+  <div id="finder-modal" class="finder-modal" hidden aria-hidden="true">
+    <div class="finder-modal__backdrop" data-finder-close tabindex="-1" aria-hidden="true"></div>
+    <div class="finder-modal__panel" role="dialog" aria-modal="true" aria-labelledby="finder-title">
+      <div class="finder-modal__head">
+        <h2 id="finder-title" class="finder-modal__title">Game Finder</h2>
+        <button type="button" class="finder-modal__close" data-finder-close aria-label="Close">✕</button>
+      </div>
+      <div class="finder-chat" id="finder-chat">
+        <article class="finder-msg finder-msg--bot">
+          Tell me what you want to play, for example:
+          "top 5 fun action games" or "top 10 games on this site".
+        </article>
+      </div>
+      <form class="finder-chat-form" id="finder-form">
+        <input
+          class="finder-chat-input"
+          id="finder-input"
+          type="text"
+          autocomplete="off"
+          placeholder="What do you want to play?"
+        />
+        <button type="submit" class="btn btn-primary finder-chat-send">Send</button>
+      </form>
+    </div>
+  </div>
+
   <!-- deploy: 2026-05-26 -->
   <script src="js/categories.js?v=2" defer></script>
   <script src="js/routes.js?v=4" defer></script>
   <script src="js/storage.js?v=3" defer></script>
+  <script src="js/personalization.js?v=1" defer></script>
   <script src="js/ui.js?v=11" defer></script>
-  <script src="js/gamepix.js?v=25" defer></script>
+  <script src="js/gamepix.js?v=27" defer></script>
   <script src="js/category-catalog.js?v=1" defer></script>
   <script src="js/ad-slot.js?v=11" defer></script>
   <script src="js/magic-bg.js?v=3" defer></script>
   <script src="js/thumb-bg.js?v=12" defer></script>
   <script src="js/animations.js?v=5" defer></script>
-  <script src="js/home.js?v=3" defer></script>
-  <script src="js/home-hub.js?v=11" defer></script>
+  <script src="js/home.js?v=4" defer></script>
+  <script src="js/home-hub.js?v=13" defer></script>
   <script src="js/contact.js?v=3" defer></script>
+  <script src="js/game-finder.js?v=3" defer></script>
   <script src="js/vercel-analytics.js?v=1" defer></script>
 </body>
 </html>

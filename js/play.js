@@ -378,6 +378,10 @@ function focusGameFrame() {
   if (!iframe) return;
   iframe.focus();
   sendGamePixCommand("resume");
+  /* Best effort: some embeds require explicit unmute after user intent. */
+  sendGamePixCommand("unmute");
+  sendGamePixCommand("audioOn");
+  sendGamePixCommand("soundOn");
 }
 
 function initGameFocus() {
@@ -387,6 +391,10 @@ function initGameFocus() {
   const layout = document.querySelector(".play-layout");
 
   if (!iframe) return;
+
+  const unlockAudio = function () {
+    focusGameFrame();
+  };
 
   if (toolbar) {
     toolbar.addEventListener("mousedown", function (e) {
@@ -404,6 +412,10 @@ function initGameFocus() {
     shell.addEventListener("mousedown", function (e) {
       if (e.target === iframe || e.target.closest("#game-frame")) return;
       focusGameFrame();
+    });
+    shell.addEventListener("touchstart", unlockAudio, {
+      passive: true,
+      once: true,
     });
   }
 
@@ -424,6 +436,14 @@ function initGameFocus() {
       window.setTimeout(focusGameFrame, 0);
     }
   });
+
+  document.addEventListener(
+    "keydown",
+    function () {
+      unlockAudio();
+    },
+    { once: true }
+  );
 }
 
 function initFullscreen() {
@@ -818,6 +838,58 @@ function recordRecentPlay(namespace, params, gameMeta) {
   window.vixoStorage.addRecent(ref);
 }
 
+function initPlaySessionTracking(namespace, title, category) {
+  const prefs = window.vixoPersonalization;
+  if (!prefs || !prefs.recordPlaySession || !namespace) return;
+
+  let activeSince = 0;
+  let activeMs = 0;
+  let flushed = false;
+
+  function canBeActive() {
+    return !document.hidden && document.visibilityState !== "hidden";
+  }
+
+  function startActive() {
+    if (!canBeActive() || activeSince) return;
+    activeSince = Date.now();
+  }
+
+  function stopActive() {
+    if (!activeSince) return;
+    activeMs += Math.max(0, Date.now() - activeSince);
+    activeSince = 0;
+  }
+
+  function flush() {
+    if (flushed) return;
+    stopActive();
+    const seconds = Math.round(activeMs / 1000);
+    if (seconds < 5) return;
+    flushed = true;
+    prefs.recordPlaySession({
+      namespace: namespace,
+      title: title || "Game",
+      category: category || "",
+      durationSec: seconds,
+    });
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (canBeActive()) {
+      startActive();
+    } else {
+      stopActive();
+    }
+  });
+  window.addEventListener("blur", stopActive);
+  window.addEventListener("focus", startActive);
+  window.addEventListener("pagehide", flush, { once: true });
+  window.addEventListener("beforeunload", flush, { once: true });
+
+  startActive();
+}
+
 async function initPlayPage() {
   const slug = window.vixoRoutes?.parseGameSlugFromLocation();
 
@@ -942,6 +1014,7 @@ async function initPlayPage() {
   initGameFocus();
   initFullscreen();
   initShareButton();
+  initPlaySessionTracking(namespace, title, category);
 
   if (!embedUrl || !iframe) {
     if (stageEl) stageEl.classList.add("is-hidden");
