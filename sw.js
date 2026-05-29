@@ -30,6 +30,7 @@ const SHELL = [
   "js/ad-slot.js",
   "js/play.js",
   "js/vercel-analytics.js",
+  "js/vercel-speed-insights.js",
   "logo/logo.png",
 ];
 
